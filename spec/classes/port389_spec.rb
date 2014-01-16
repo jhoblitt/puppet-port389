@@ -1,6 +1,16 @@
 require 'spec_helper'
 
 describe 'port389', :type => :class do
+  shared_examples 'been_tuned' do
+    it { should contain_class('limits').with({ :purge_limits_d_dir => false }) }
+    it { should contain_sysctl('fs.file-max') }
+    it { should contain_limits__limits('all_both_nofile') }
+    it { should contain_limits__limits('nobody_soft_nofile') }
+    it { should contain_limits__limits('nobody_hard_nofile') }
+    it { should contain_limits__limits('nobody_soft_nproc') }
+    it { should contain_limits__limits('nobody_hard_nproc') }
+    it { should contain_sysctl('net.ipv4.ip_local_port_range') }
+  end
 
   describe 'on osfamily RedHat' do
     let(:facts) {{ :osfamily => 'RedHat' }}
@@ -27,6 +37,31 @@ describe 'port389', :type => :class do
       #'389-dsgw-debuginfo',
     ].each do |pkg|
       it('should include package') { should contain_package(pkg) }
+    end
+
+    context 'enable_tuning' do
+      context '=> true' do
+        let(:params) {{ :enable_tuning => true }}
+
+        it { should contain_class('port389::tune') }
+        it_should_behave_like 'been_tuned'
+      end
+
+      context '=> false' do
+        let(:params) {{ :enable_tuning => false }}
+
+        it { should_not contain_class('port389::tune') }
+      end
+
+      context '=> []' do
+        let(:params) {{ :enable_tuning =>[] }}
+
+        it 'should fail' do
+          expect {
+            should contain_class('port389')
+          }.to raise_error(/is not a boolean/)
+        end
+      end
     end
   end # on osfamily RedHat
 
