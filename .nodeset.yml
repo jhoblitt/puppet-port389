@@ -1,0 +1,62 @@
+---
+default_set: 'centos-64-x64'
+sets:
+  'centos-58-x64':
+    nodes:
+      "main":
+        prefab: 'centos-58-x64'
+  'centos-59-x64':
+    nodes:
+      "main":
+        prefab: 'centos-59-x64'
+  'centos-63-x64':
+    nodes:
+      "main":
+        prefab: 'centos-63-x64'
+  'centos-64-x64':
+    nodes:
+      "main":
+        prefab: 'centos-64-x64'
+  'fedora-18-x64':
+    nodes:
+      "main":
+        prefab: 'fedora-18-x64'
+  'debian-606-x64':
+    nodes:
+      "main":
+        prefab: 'debian-606-x64'
+  'debian-607-x64':
+    nodes:
+      "main":
+        prefab: 'debian-607-x64'
+  'debian-70rc1-x64':
+    nodes:
+      "main":
+        prefab: 'debian-70rc1-x64'
+  'ubuntu-server-1004-x64':
+    nodes:
+      "main":
+        prefab: 'ubuntu-server-1004-x64'
+  'ubuntu-server-10044-x64':
+    nodes:
+      "main":
+        prefab: 'ubuntu-server-10044-x64'
+  'ubuntu-server-1204-x64':
+    nodes:
+      "main":
+        prefab: 'ubuntu-server-1204-x64'
+  'ubuntu-server-12042-x64':
+    nodes:
+      "main":
+        prefab: 'ubuntu-server-12042-x64'
+  'sles-11sp1-x64':
+    nodes:
+      "main":
+        prefab: 'sles-11sp1-x64'
+  'centos-64-x64-multi':
+    default_node: 'first'
+    nodes:
+      "first":
+        prefab: 'centos-64-x64'
+      "second":
+        prefab: 'centos-64-x64'
