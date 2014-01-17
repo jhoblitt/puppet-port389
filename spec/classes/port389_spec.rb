@@ -39,6 +39,15 @@ describe 'port389', :type => :class do
       it('should include package') { should contain_package(pkg) }
     end
 
+    it 'should manage setup dir' do
+      should contain_file('/var/lib/dirsrv/setup').with({
+        :ensure => 'directory',
+        :owner  => 'nobody',
+        :group  => 'nobody',
+        :mode   => '0700',
+      })
+    end
+
     context 'enable_tuning' do
       context '=> true' do
         let(:params) {{ :enable_tuning => true }}

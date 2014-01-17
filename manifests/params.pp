@@ -31,4 +31,33 @@ class port389::params {
   # we need to ensure the presence of this package but do not want 'ownership'
   # of it
   $package_ensure = 'httpd'
+
+  # this might need to be turned off by default on some platforms
+  $enable_tuning = true
+
+  # uid/gid
+  $user  = 'nobody'
+  $group = $user
+
+  # general section defaults
+  $admin_domain               = $::domain
+  $config_directory_admin_id  = 'admin'
+  $config_directory_admin_pwd = $config_directory_admin_id
+  $config_directory_ldap_url  = "ldap://${::fqdn}:389/o=NetscapeRoot"
+  $full_machine_name          = $::fqdn
+
+  # admin section defaults
+  $server_admin_port = '9830'
+  $server_admin_id   = 'admin'
+  $server_admin_pwd  = $server_admin_id
+  $server_ipaddress  = '0.0.0.0'
+
+  # slapd section defaults
+  $root_dn     = 'cn=Directory Manager'
+  $root_dn_pwd = 'admin'
+  $server_port = '389'
+
+  # the dir under which setup-ds-admin.pl .inf files will be created and stored
+  # note that /var/lib/dirsrv/ is created by the 389-ds-base package
+  $setup_dir = '/var/lib/dirsrv/setup'
 }

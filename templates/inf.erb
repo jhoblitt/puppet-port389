@@ -1,0 +1,14 @@
+<% @data.keys.sort.each do |section| -%>
+[<%= section %>]
+  <%- mysection = @data[section] -%>
+  <%- mysection.keys.sort.each do |key| -%>
+    <%- next if mysection[key].nil? -%>
+    <%- if mysection[key].is_a?(Array) -%>
+      <%- mysection[key].each do |v| -%>
+<%= key %>=<%= v %>
+      <%- end -%>
+    <%- else -%>
+<%= key %>=<%= mysection[key] %>
+    <%- end -%>
+  <%- end -%>
+<%- end -%>
