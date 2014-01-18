@@ -2,7 +2,9 @@
 [<%= section %>]
   <%- mysection = @data[section] -%>
   <%- mysection.keys.sort.each do |key| -%>
-    <%- next if mysection[key].nil? -%>
+    <%- # at least puppet 3.4.2 leaks :undef-%>
+    <%- # https://tickets.puppetlabs.com/browse/PUP-1467 -%>
+    <%- next if mysection[key].nil? || mysection[key] == :undef -%>
     <%- if mysection[key].is_a?(Array) -%>
       <%- mysection[key].each do |v| -%>
 <%= key %>=<%= v %>

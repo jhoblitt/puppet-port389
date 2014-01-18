@@ -7,6 +7,7 @@ define port389::instance (
   $root_dn_pwd                = $::port389::root_dn_pwd,
   $server_port                = $::port389::server_port,
   $suffix                     = port389_domain2dn($::port389::admin_domain),
+  $schema_file                = undef,
 ) {
   # follow the same server identifier validation rules as setup-ds-admin.pl
   validate_re($title, '^[\w#%:@-]*$', "The ServerIdentifier '${title}' contains invalid characters.  It must contain only alphanumeric characters and the following: #%:@_-")
@@ -49,13 +50,13 @@ define port389::instance (
       'InstallLdifFile'  => '',
       'RootDN'           => $root_dn,
       'RootDNPwd'        => $root_dn_pwd,
+      'SchemaFile'       => $schema_file,
       'ServerIdentifier' => $title,
       'ServerPort'       => $server_port,
       'SlapdConfigForMC' => 'yes',
       'Suffix'           => $suffix,
       'UseExistingMC'    => '0',
       'ds_bename'        => 'userRoot',
-      #'SchemaFile'       => [],
       #'bak_dir' => '/var/lib/dirsrv/slapd-ldap1/bak',
       #'bindir' => '/usr/bin',
       #'cert_dir' => '/etc/dirsrv/slapd-ldap1',

@@ -78,6 +78,44 @@ ds_bename=userRoot
         :logoutput => true,
       })
     end
+
+    context 'schema_file =>' do
+      context '/dne/foo.ldif' do
+        let(:params) {{ :schema_file => '/dne/foo.ldif' }}
+
+        it do
+          should contain_file('setup_ldap1.inf').with({
+            :ensure  => 'file',
+            :path    => '/var/lib/dirsrv/setup/setup_ldap1.inf',
+            :owner   => 'nobody',
+            :group   => 'nobody',
+            :mode    => '0600',
+            :backup  => false,
+            :content => %r{SchemaFile=/dne/foo.ldif},
+          })
+        end
+      end
+
+      context '[ /dne/foo.ldif, /dne/bar.ldif ]' do
+        files = %w{ /dne/foo.ldif /dne/bar.ldif }
+        let(:params) {{ :schema_file => files }}
+
+        files.each do |f|
+          it do
+            should contain_file('setup_ldap1.inf').with({
+              :ensure  => 'file',
+              :path    => '/var/lib/dirsrv/setup/setup_ldap1.inf',
+              :owner   => 'nobody',
+              :group   => 'nobody',
+              :mode    => '0600',
+              :backup  => false,
+              :content => /SchemaFile=#{files}/
+            })
+          end
+        end
+      end
+
+    end # schema_file =>
   end
 
 end
