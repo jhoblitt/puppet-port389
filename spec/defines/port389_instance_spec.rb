@@ -116,6 +116,34 @@ ds_bename=userRoot
       end
 
     end # schema_file =>
-  end
+  end # setup.inf
+
+  context 'class { port389: ensure => ... }' do
+    let(:title) { 'ldap1' }
+
+    %w{ present latest }.each do |state|
+      context state do
+        let(:pre_condition) do <<-EOS
+          class { 'port389': ensure => #{state} }
+          EOS
+        end
+
+        it { should contain_file('setup_ldap1.inf') }
+        it { should contain_exec('setup-ds-admin.pl_ldap1') }
+      end
+    end
+
+    %w{ absent purged }.each do |state|
+      context state do
+        let(:pre_condition) do <<-EOS
+          class { 'port389': ensure => #{state} }
+          EOS
+        end
+
+        it { should_not contain_file('setup_ldap1.inf') }
+        it { should_not contain_exec('setup-ds-admin.pl_ldap1') }
+      end
+    end
+  end # class { port389: ensure => ... }
 
 end

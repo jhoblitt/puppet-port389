@@ -78,24 +78,31 @@ define port389::instance (
     },
   }
 
-  # disable bucketting since the .inf file contains password information
-  file { $setup_inf_name:
-    ensure  => file,
-    path    => $setup_inf_path,
-    owner   => $::port389::user,
-    group   => $::port389::group,
-    mode    => '0600',
-    content => template("${module_name}/inf.erb"),
-    backup  => false,
-  } ->
-  # /usr/sbin/setup-ds-admin.pl needs:
-  #   /bin/{grep, cat, uname, sleep, ...}
-  #   /sbin/service
-  #   /usr/bin/env
-  exec { "setup-ds-admin.pl_${title}":
-    path      => [ '/bin', '/sbin', '/usr/bin', '/usr/sbin' ],
-    command   => "setup-ds-admin.pl --file=${setup_inf_path} --silent",
-    unless    => "/usr/bin/test -e /etc/dirsrv/slapd-${title}",
-    logoutput => true,
+  case $::port389::ensure {
+    'present', 'latest': {
+      # disable bucketting since the .inf file contains password information
+      file { $setup_inf_name:
+        ensure  => file,
+        path    => $setup_inf_path,
+        owner   => $::port389::user,
+        group   => $::port389::group,
+        mode    => '0600',
+        content => template("${module_name}/inf.erb"),
+        backup  => false,
+      } ->
+      # /usr/sbin/setup-ds-admin.pl needs:
+      #   /bin/{grep, cat, uname, sleep, ...}
+      #   /sbin/service
+      #   /usr/bin/env
+      exec { "setup-ds-admin.pl_${title}":
+        path      => [ '/bin', '/sbin', '/usr/bin', '/usr/sbin' ],
+        command   => "setup-ds-admin.pl --file=${setup_inf_path} --silent",
+        unless    => "/usr/bin/test -e /etc/dirsrv/slapd-${title}",
+        logoutput => true,
+      }
+    }
+    default: {
+      warning("it is meaningless to declare Port389::Instance[${name}] while Class[port389]{ ensure => 'absent|purged' }")
+    }
   }
 }
