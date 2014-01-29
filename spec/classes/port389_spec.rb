@@ -15,10 +15,7 @@ describe 'port389', :type => :class do
   describe 'on osfamily RedHat' do
     let(:facts) {{ :osfamily => 'RedHat' }}
 
-    it('should import') { should contain_class('port389') }
-
-    it('should include package dependency') { should contain_package('httpd') }
-    [
+    redhat_packages = [
       '389-admin',
       '389-admin-console',
       '389-admin-console-doc',
@@ -35,25 +32,32 @@ describe 'port389', :type => :class do
       '389-ds-console-doc',
       '389-dsgw',
       #'389-dsgw-debuginfo',
-    ].each do |pkg|
-      it('should include package') { should contain_package(pkg) }
-    end
+    ]
 
-    it 'should manage setup dir' do
-      should contain_file('/var/lib/dirsrv/setup').with({
-        :ensure => 'directory',
-        :owner  => 'nobody',
-        :group  => 'nobody',
-        :mode   => '0700',
-      })
-    end
+    context 'param defaults' do
+      it_should_behave_like 'been_tuned'
+      it('should include package dependency') { should contain_package('httpd') }
+      redhat_packages.each do |pkg|
+        it('should include package') { should contain_package(pkg) }
+      end
+      it 'should manage setup dir' do
+        should contain_file('/var/lib/dirsrv/setup').with({
+          :ensure => 'directory',
+          :owner  => 'nobody',
+          :group  => 'nobody',
+          :mode   => '0700',
+        })
+      end
+    end # param defaults
 
     context 'ensure =>' do
       context 'present' do
         let(:params) {{ :ensure => 'present' }}
 
-        it { should contain_class('port389::tune') }
-        it { should contain_class('port389::install').with_ensure('present') }
+        it_should_behave_like 'been_tuned'
+        redhat_packages.each do |pkg|
+          it { should contain_package(pkg).with_ensure('present') }
+        end
         it do
           should contain_file('/var/lib/dirsrv/setup').with({
             :ensure => 'directory',
@@ -67,8 +71,10 @@ describe 'port389', :type => :class do
       context 'latest' do
         let(:params) {{ :ensure => 'latest' }}
 
-        it { should contain_class('port389::tune') }
-        it { should contain_class('port389::install').with_ensure('latest') }
+        it_should_behave_like 'been_tuned'
+        redhat_packages.each do |pkg|
+          it { should contain_package(pkg).with_ensure('latest') }
+        end
         it do
           should contain_file('/var/lib/dirsrv/setup').with({
             :ensure => 'directory',
@@ -83,7 +89,9 @@ describe 'port389', :type => :class do
         let(:params) {{ :ensure => 'absent' }}
 
         it { should_not contain_class('port389::tune') }
-        it { should contain_class('port389::install').with_ensure('absent') }
+        redhat_packages.each do |pkg|
+          it { should contain_package(pkg).with_ensure('absent') }
+        end
         it { should_not contain_file('/var/lib/dirsrv/setup') }
       end
 
@@ -91,7 +99,9 @@ describe 'port389', :type => :class do
         let(:params) {{ :ensure => 'purged' }}
 
         it { should_not contain_class('port389::tune') }
-        it { should contain_class('port389::install').with_ensure('purged') }
+        redhat_packages.each do |pkg|
+          it { should contain_package(pkg).with_ensure('absent') }
+        end
         it do
           should contain_file('/var/lib/dirsrv/setup').with({
             :ensure => 'absent',
@@ -123,7 +133,7 @@ describe 'port389', :type => :class do
 
         it 'should fail' do
           expect {
-            should contain_class('port389')
+            should compile
           }.to raise_error(/"foo" does not match/)
         end
       end
@@ -148,7 +158,7 @@ describe 'port389', :type => :class do
 
         it 'should fail' do
           expect {
-            should contain_class('port389')
+            should compile
           }.to raise_error(/is not a boolean/)
         end
       end
@@ -159,7 +169,7 @@ describe 'port389', :type => :class do
     let(:facts) {{ :osfamily => 'Debian', :operatingsystem => 'Debian' }}
 
     it 'should fail' do
-     expect { should contain_class('port389') }.
+     expect { should compile }.
         to raise_error(Puppet::Error, /not supported on Debian/)
     end
   end # on an unsupported osfamily

@@ -10,8 +10,19 @@ class port389::install (
 
   validate_re($ensure, '^present$|^absent$|^latest$|^purged$')
 
+  # As of puppet 3.4.2, the yum provider for the package type does not handle
+  # 'purged' correctly and shows activity on every run.
+  if $::osfamily == 'RedHat' {
+    $safe_ensure = $ensure ? {
+      'purged' => 'absent',
+      default  => $ensure,
+    }
+  } else {
+    $safe_ensure = $ensure
+  }
+
   package { $package_name:
-    ensure => $ensure,
+    ensure => $safe_ensure,
   }
 
   case $ensure {
