@@ -48,21 +48,102 @@ describe 'port389', :type => :class do
       })
     end
 
-    context 'enable_tuning' do
-      context '=> true' do
+    context 'ensure =>' do
+      context 'present' do
+        let(:params) {{ :ensure => 'present' }}
+
+        it { should contain_class('port389::tune') }
+        it { should contain_class('port389::install').with_ensure('present') }
+        it do
+          should contain_file('/var/lib/dirsrv/setup').with({
+            :ensure => 'directory',
+            :owner  => 'nobody',
+            :group  => 'nobody',
+            :mode   => '0700',
+          })
+        end
+      end
+
+      context 'latest' do
+        let(:params) {{ :ensure => 'latest' }}
+
+        it { should contain_class('port389::tune') }
+        it { should contain_class('port389::install').with_ensure('latest') }
+        it do
+          should contain_file('/var/lib/dirsrv/setup').with({
+            :ensure => 'directory',
+            :owner  => 'nobody',
+            :group  => 'nobody',
+            :mode   => '0700',
+          })
+        end
+      end
+
+      context 'absent' do
+        let(:params) {{ :ensure => 'absent' }}
+
+        it { should_not contain_class('port389::tune') }
+        it { should contain_class('port389::install').with_ensure('absent') }
+        it { should_not contain_file('/var/lib/dirsrv/setup') }
+      end
+
+      context 'purged' do
+        let(:params) {{ :ensure => 'purged' }}
+
+        it { should_not contain_class('port389::tune') }
+        it { should contain_class('port389::install').with_ensure('purged') }
+        it do
+          should contain_file('/var/lib/dirsrv/setup').with({
+            :ensure => 'absent',
+            :force  => true,
+          })
+        end
+        [
+          'rm -f /etc/sysconfig/dirsrv*',
+          'rm -rf /etc/dirsrv/',
+          'rm -rf /usr/lib64/dirsrv/',
+          'rm -rf /var/log/dirsrv/',
+          'rm -rf /var/lib/dirsrv/',
+          'rm -rf /var/lock/dirsrv/',
+          'rm -rf /usr/share/dirsrv/',
+          'rm -f /etc/selinux/targeted/modules/active/modules/dirsrv-admin.pp',
+          'rm -f /etc/selinux/targeted/modules/active/modules/dirsrv.pp',
+          'rm -f /usr/share/selinux/devel/include/services/dirsrv-admin.if',
+          'rm -f /usr/share/selinux/devel/include/services/dirsrv.if',
+          'rm -f /usr/share/selinux/targeted/dirsrv-admin.pp.bz2',
+          'rm -f /usr/share/selinux/targeted/dirsrv.pp.bz2',
+        ].each do |cmd|
+          it { should contain_exec(cmd) }
+        end
+
+      end
+
+      context 'foo' do
+        let(:params) {{ :ensure => 'foo' }}
+
+        it 'should fail' do
+          expect {
+            should contain_class('port389')
+          }.to raise_error(/"foo" does not match/)
+        end
+      end
+    end # ensure =>
+
+    context 'enable_tuning =>' do
+      context 'true' do
         let(:params) {{ :enable_tuning => true }}
 
         it { should contain_class('port389::tune') }
         it_should_behave_like 'been_tuned'
       end
 
-      context '=> false' do
+      context 'false' do
         let(:params) {{ :enable_tuning => false }}
 
         it { should_not contain_class('port389::tune') }
       end
 
-      context '=> []' do
+      context '[]' do
         let(:params) {{ :enable_tuning =>[] }}
 
         it 'should fail' do
@@ -71,7 +152,7 @@ describe 'port389', :type => :class do
           }.to raise_error(/is not a boolean/)
         end
       end
-    end
+    end # enable_tuning =>
   end # on osfamily RedHat
 
   describe 'on an unsupported osfamily' do

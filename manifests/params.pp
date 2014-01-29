@@ -60,4 +60,20 @@ class port389::params {
   # the dir under which setup-ds-admin.pl .inf files will be created and stored
   # note that /var/lib/dirsrv/ is created by the 389-ds-base package
   $setup_dir = '/var/lib/dirsrv/setup'
+
+  $purge_commands = [
+    'rm -f /etc/sysconfig/dirsrv*',
+    'rm -rf /etc/dirsrv/',
+    'rm -rf /usr/lib64/dirsrv/',
+    'rm -rf /var/log/dirsrv/',
+    'rm -rf /var/lib/dirsrv/',
+    'rm -rf /var/lock/dirsrv/',
+    'rm -rf /usr/share/dirsrv/',
+    'rm -f /etc/selinux/targeted/modules/active/modules/dirsrv-admin.pp',
+    'rm -f /etc/selinux/targeted/modules/active/modules/dirsrv.pp',
+    'rm -f /usr/share/selinux/devel/include/services/dirsrv-admin.if',
+    'rm -f /usr/share/selinux/devel/include/services/dirsrv.if',
+    'rm -f /usr/share/selinux/targeted/dirsrv-admin.pp.bz2',
+    'rm -f /usr/share/selinux/targeted/dirsrv.pp.bz2',
+  ]
 }

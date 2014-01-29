@@ -7,6 +7,7 @@
 # include port389
 #
 class port389(
+  $ensure                     = 'present',
   $package_ensure             = $::port389::params::package_ensure,
   $package_name               = $::port389::params::package_name,
   $enable_tuning              = $::port389::params::enable_tuning,
@@ -26,6 +27,7 @@ class port389(
   $server_port                = $::port389::params::server_port,
   $setup_dir                  = $::port389::params::setup_dir,
 ) inherits port389::params {
+  validate_re($ensure, '^present$|^absent$|^latest$|^purged$')
   if !(is_string($package_ensure) or is_array($package_ensure)) {
     fail('package_ensure must be a string or an array')
   }
@@ -49,20 +51,43 @@ class port389(
   validate_string($server_port)
   validate_string($setup_dir)
 
-  if $enable_tuning {
-    Anchor['port389::begin'] ->
-    class { 'port389::tune': } ->
-    Anchor['port389::end']
+  anchor { 'port389::begin': }
+
+  case $ensure {
+    'present', 'latest': {
+      if $enable_tuning {
+        Anchor['port389::begin'] ->
+        class { 'port389::tune': } ->
+        Anchor['port389::end']
+      }
+
+      Anchor['port389::begin'] ->
+      class { 'port389::install': ensure => $ensure } ->
+      file { $setup_dir:
+        ensure => directory,
+        owner  => $user,
+        group  => $group,
+        mode   => '0700',
+      } ->
+      Port389::Instance<| |> ->
+      Anchor['port389::end']
+    }
+    'absent': {
+      Anchor['port389::begin'] ->
+      class { 'port389::install': ensure => $ensure } ->
+      Anchor['port389::end']
+    }
+    'purged': {
+      Anchor['port389::begin'] ->
+      class { 'port389::install': ensure => $ensure } ->
+      file { $setup_dir:
+        ensure => absent,
+        force  => true,
+      } ->
+      Anchor['port389::end']
+    }
+    default: {} # keep lint happy
   }
 
-  anchor { 'port389::begin': } ->
-  class { 'port389::install': } ->
-  file { $setup_dir:
-    ensure => directory,
-    owner  => $user,
-    group  => $group,
-    mode   => '0700',
-  } ->
-  Port389::Instance<| |> ->
   anchor { 'port389::end': }
 }
