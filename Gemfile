@@ -12,6 +12,6 @@ gem 'puppet-lint',                    :require => false
 gem 'puppet-syntax',                  :require => false
 gem 'rspec-system',                   :require => false
 gem 'rspec-system-puppet',            :require => false
-gem 'rspec-puppet', '1.0.1', :git => 'https://github.com/jhoblitt/rspec-puppet', :ref => '2de529d5a4bc01f91a4f6061c957badc6844ac6f', :require => false
+gem 'rspec-puppet', '1.0.1', :git => 'https://github.com/rodjek/rspec-puppet.git', :ref => '03e94422fb9bbdd950d5a0bec6ead5d76e06616b', :require => false
 gem 'rspec-system-serverspec', '>=2', :require => false
 gem 'serverspec',                     :require => false
