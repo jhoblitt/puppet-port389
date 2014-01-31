@@ -1,0 +1,18 @@
+dn: cn=encryption,cn=config
+changetype: modify
+replace: nsSSL3
+nsSSL3: on
+-
+replace: nsSSLClientAuth
+nsSSLClientAuth: allowed
+-
+replace: nsSSL3Ciphers
+nsSSL3Ciphers: -rsa_null_md5,+rsa_rc4_128_md5,+rsa_rc4_40_md5,+rsa_rc2_40_md5,+rsa_des_sha,+rsa_fips_des_sha,+rsa_3des_sha,+rsa_fips_3des_sha,+fortezza,+fortezza_rc4_128_sha,+fortezza_null,+tls_rsa_export1024_with_rc4_56_sha,+tls_rsa_export1024_with_des_cbc_sha,-rc4,-rc4export,-rc2,-rc2export,-des,-desede3
+
+dn: cn=config
+changetype: modify
+add: nsslapd-security
+nsslapd-security: on
+-
+replace: nsslapd-ssl-check-hostname
+nsslapd-ssl-check-hostname: off

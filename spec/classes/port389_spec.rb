@@ -170,7 +170,7 @@ describe 'port389', :type => :class do
 
     it 'should fail' do
      expect { should compile }.
-        to raise_error(Puppet::Error, /not supported on Debian/)
+        to raise_error(/not supported on Debian/)
     end
   end # on an unsupported osfamily
 

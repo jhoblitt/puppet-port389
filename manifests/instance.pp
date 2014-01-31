@@ -8,6 +8,11 @@ define port389::instance (
   $server_port                = $::port389::server_port,
   $suffix                     = port389_domain2dn($::port389::admin_domain),
   $schema_file                = undef,
+  $enable_ssl                 = false,
+  $ssl_server_port            = '636',
+  $ssl_cert                   = undef,
+  $ssl_key                    = undef,
+  $ssl_ca_certs               = {},
 ) {
   # follow the same server identifier validation rules as setup-ds-admin.pl
   validate_re($title, '^[\w#%:@-]*$', "The ServerIdentifier '${title}' contains invalid characters.  It must contain only alphanumeric characters and the following: #%:@_-")
@@ -19,6 +24,15 @@ define port389::instance (
   validate_string($root_dn_pwd)
   validate_string($server_port)
   validate_string($suffix)
+  # ssl
+  validate_bool($enable_ssl)
+  # don't validate ssl_* params unless $enable_ssl == true
+  if $enable_ssl {
+    validate_string($ssl_server_port)
+    validate_absolute_path($ssl_cert)
+    validate_absolute_path($ssl_key)
+    validate_hash($ssl_ca_certs)
+  }
 
   $setup_inf_name = "setup_${title}.inf"
   $setup_inf_path = "${::port389::setup_dir}/${setup_inf_name}"
@@ -99,6 +113,19 @@ define port389::instance (
         command   => "setup-ds-admin.pl --file=${setup_inf_path} --silent",
         unless    => "/usr/bin/test -e /etc/dirsrv/slapd-${title}",
         logoutput => true,
+      }
+
+      if $enable_ssl {
+        Exec["setup-ds-admin.pl_${title}"] ->
+        port389::instance::ssl { $name:
+          root_dn         => $root_dn,
+          root_dn_pwd     => $root_dn_pwd,
+          server_port     => $server_port,
+          ssl_server_port => $ssl_server_port,
+          ssl_cert        => $ssl_cert,
+          ssl_key         => $ssl_key,
+          ssl_ca_certs    => $ssl_ca_certs,
+        }
       }
     }
     default: {
