@@ -66,7 +66,7 @@ describe 'port389', :type => :class do
             :mode   => '0700',
           })
         end
-      end
+      end # present
 
       context 'latest' do
         let(:params) {{ :ensure => 'latest' }}
@@ -83,30 +83,38 @@ describe 'port389', :type => :class do
             :mode   => '0700',
           })
         end
-      end
+      end # latest
 
       context 'absent' do
         let(:params) {{ :ensure => 'absent' }}
 
         it { should_not contain_class('port389::tune') }
+        it do
+          # XXX implimentation specific
+          should contain_service('dirsrv').with({
+            :ensure => 'stopped',
+            :enable => false,
+          }).that_comes_before('Class[port389::install]')
+        end
         redhat_packages.each do |pkg|
           it { should contain_package(pkg).with_ensure('absent') }
         end
         it { should_not contain_file('/var/lib/dirsrv/setup') }
-      end
+      end # absent
 
       context 'purged' do
         let(:params) {{ :ensure => 'purged' }}
 
         it { should_not contain_class('port389::tune') }
+        it do
+          # XXX implimentation specific
+          should contain_service('dirsrv').with({
+            :ensure => 'stopped',
+            :enable => false,
+          }).that_comes_before('Class[port389::install]')
+        end
         redhat_packages.each do |pkg|
           it { should contain_package(pkg).with_ensure('absent') }
-        end
-        it do
-          should contain_file('/var/lib/dirsrv/setup').with({
-            :ensure => 'absent',
-            :force  => true,
-          })
         end
         [
           'rm -f /etc/sysconfig/dirsrv*',
@@ -125,8 +133,14 @@ describe 'port389', :type => :class do
         ].each do |cmd|
           it { should contain_exec(cmd) }
         end
-
-      end
+        it do
+          # XXX implimentation specific
+          should contain_file('/var/lib/dirsrv/setup').with({
+            :ensure => 'absent',
+            :force  => true,
+          }).that_requires('Class[port389::install]')
+        end
+      end # purged
 
       context 'foo' do
         let(:params) {{ :ensure => 'foo' }}
@@ -136,7 +150,7 @@ describe 'port389', :type => :class do
             should compile
           }.to raise_error(/"foo" does not match/)
         end
-      end
+      end # foo
     end # ensure =>
 
     context 'enable_tuning =>' do
@@ -145,13 +159,13 @@ describe 'port389', :type => :class do
 
         it { should contain_class('port389::tune') }
         it_should_behave_like 'been_tuned'
-      end
+      end # true
 
       context 'false' do
         let(:params) {{ :enable_tuning => false }}
 
         it { should_not contain_class('port389::tune') }
-      end
+      end # false
 
       context '[]' do
         let(:params) {{ :enable_tuning =>[] }}
@@ -161,7 +175,7 @@ describe 'port389', :type => :class do
             should compile
           }.to raise_error(/is not a boolean/)
         end
-      end
+      end # []
     end # enable_tuning =>
   end # on osfamily RedHat
 

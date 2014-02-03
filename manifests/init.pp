@@ -72,13 +72,25 @@ class port389(
       Port389::Instance<| |> ->
       Anchor['port389::end']
     }
+    # the global 'dirsrv' service is only managed for uninstall
+    # otherwise, each instance manages it's own 'sub' dirsrv service instance
     'absent': {
       Anchor['port389::begin'] ->
+      service { 'dirsrv':
+        ensure => 'stopped',
+        enable => false,
+      } ->
       class { 'port389::install': ensure => $ensure } ->
       Anchor['port389::end']
     }
     'purged': {
       Anchor['port389::begin'] ->
+      service { 'dirsrv':
+        ensure     => 'stopped',
+        enable     => false,
+        hasstatus  => true,
+        hasrestart => true,
+      } ->
       class { 'port389::install': ensure => $ensure } ->
       file { $setup_dir:
         ensure => absent,

@@ -113,6 +113,7 @@ define port389::instance (
         command   => "setup-ds-admin.pl --file=${setup_inf_path} --silent",
         unless    => "/usr/bin/test -e /etc/dirsrv/slapd-${title}",
         logoutput => true,
+        notify    => Service[$title],
       }
 
       if $enable_ssl {
@@ -125,7 +126,17 @@ define port389::instance (
           ssl_cert        => $ssl_cert,
           ssl_key         => $ssl_key,
           ssl_ca_certs    => $ssl_ca_certs,
+          notify          => Service[$title],
         }
+      }
+
+      # XXX this is extremely RedHat specific
+      service { $title:
+        ensure     => 'running',
+        control    => 'dirsrv',
+        hasstatus  => true,
+        hasrestart => true,
+        provider   => 'redhat_instance',
       }
     }
     default: {

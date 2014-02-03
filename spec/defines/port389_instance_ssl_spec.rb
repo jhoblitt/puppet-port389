@@ -131,6 +131,12 @@ nsslapd-secureport: 636
           :cert     => '/tmp/globalsign_root.pem',
         })
       end
+
+      # XXX highly internal implimentation specific
+      it do
+        should contain_port389__instance__ssl('ldap1').
+          that_notifies('Service[ldap1]')
+      end
     end # true
 
     context 'false' do

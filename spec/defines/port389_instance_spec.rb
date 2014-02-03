@@ -76,6 +76,16 @@ ds_bename=userRoot
         :command   => 'setup-ds-admin.pl --file=/var/lib/dirsrv/setup/setup_ldap1.inf --silent',
         :unless    => '/usr/bin/test -e /etc/dirsrv/slapd-ldap1',
         :logoutput => true,
+      }).that_notifies('Service[ldap1]')
+    end
+
+    it do
+      should contain_service('ldap1').with({
+        :ensure     => 'running',
+        :control    => 'dirsrv',
+        :hasstatus  => true,
+        :hasrestart => true,
+        :provider   => 'redhat_instance',
       })
     end
 
