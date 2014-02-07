@@ -8,6 +8,14 @@ define port389::instance::ssl (
   $ssl_key,
   $ssl_ca_certs,
 ) {
+  validate_string($root_dn)
+  validate_string($root_dn_pwd)
+  validate_string($server_port)
+  validate_string($ssl_server_port)
+  validate_absolute_path($ssl_cert)
+  validate_absolute_path($ssl_key)
+  validate_hash($ssl_ca_certs)
+
   if $caller_module_name != $module_name {
     fail("Use of private type ${name} by ${caller_module_name}")
   }
