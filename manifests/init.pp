@@ -26,6 +26,12 @@ class port389(
   $root_dn_pwd                = $::port389::params::root_dn_pwd,
   $server_port                = $::port389::params::server_port,
   $setup_dir                  = $::port389::params::setup_dir,
+  $enable_ssl                 = $::port389::params::enable_ssl,
+  $enable_server_admin_ssl    = $::port389::params::enable_server_admin_ssl,
+  $ssl_server_port            = $::port389::params::ssl_server_port,
+  $ssl_cert                   = $::port389::params::ssl_cert,
+  $ssl_key                    = $::port389::params::ssl_key,
+  $ssl_ca_certs               = $::port389::params::ssl_ca_certs,
 ) inherits port389::params {
   validate_re($ensure, '^present$|^absent$|^latest$|^purged$')
   if !(is_string($package_ensure) or is_array($package_ensure)) {
@@ -50,6 +56,16 @@ class port389(
   validate_string($root_dn_pwd)
   validate_string($server_port)
   validate_string($setup_dir)
+  validate_string($suffix)
+  # ssl
+  validate_bool($enable_ssl)
+  # don't validate ssl_* params unless $enable_ssl == true
+  if $enable_ssl {
+    validate_string($ssl_server_port)
+    validate_absolute_path($ssl_cert)
+    validate_absolute_path($ssl_key)
+    validate_hash($ssl_ca_certs)
+  }
 
   anchor { 'port389::begin': }
 

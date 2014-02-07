@@ -61,6 +61,14 @@ class port389::params {
   # note that /var/lib/dirsrv/ is created by the 389-ds-base package
   $setup_dir = '/var/lib/dirsrv/setup'
 
+  # ssl
+  $enable_ssl              = false
+  $ssl_server_port         = '636'
+  $ssl_cert                = undef
+  $ssl_key                 = undef
+  $ssl_ca_certs            = {}
+  $enable_server_admin_ssl = false
+
   $purge_commands = [
     'rm -f /etc/sysconfig/dirsrv*',
     'rm -rf /etc/dirsrv/',

@@ -2,6 +2,7 @@ require 'spec_helper'
 
 describe 'port389::instance', :type => :define do
   let(:facts) {{ :osfamily => 'RedHat' }}
+  let(:pre_condition) { 'include port389' }
 
   context 'title =>' do
     context 'ldap1' do
@@ -28,7 +29,6 @@ describe 'port389::instance', :type => :define do
       facts[:fqdn]   = 'bar.foo.example.org'
     end
     let(:title) { 'ldap1' }
-    let(:pre_condition) { 'include port389' }
 
     it do
       should contain_file('setup_ldap1.inf').with({

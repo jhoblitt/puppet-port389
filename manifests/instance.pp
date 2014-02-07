@@ -6,13 +6,13 @@ define port389::instance (
   $root_dn                    = $::port389::root_dn,
   $root_dn_pwd                = $::port389::root_dn_pwd,
   $server_port                = $::port389::server_port,
-  $suffix                     = port389_domain2dn($::port389::admin_domain),
+  $enable_ssl                 = $::port389::enable_ssl,
+  $ssl_server_port            = $::port389::ssl_server_port,
+  $ssl_cert                   = $::port389::ssl_cert,
+  $ssl_key                    = $::port389::ssl_key,
+  $ssl_ca_certs               = $::port389::ssl_ca_certs,
   $schema_file                = undef,
-  $enable_ssl                 = false,
-  $ssl_server_port            = '636',
-  $ssl_cert                   = undef,
-  $ssl_key                    = undef,
-  $ssl_ca_certs               = {},
+  $suffix                     = port389_domain2dn($::port389::admin_domain),
 ) {
   # follow the same server identifier validation rules as setup-ds-admin.pl
   validate_re($title, '^[\w#%:@-]*$', "The ServerIdentifier '${title}' contains invalid characters.  It must contain only alphanumeric characters and the following: #%:@_-")
@@ -23,7 +23,6 @@ define port389::instance (
   validate_string($root_dn)
   validate_string($root_dn_pwd)
   validate_string($server_port)
-  validate_string($suffix)
   # ssl
   validate_bool($enable_ssl)
   # don't validate ssl_* params unless $enable_ssl == true
@@ -33,6 +32,8 @@ define port389::instance (
     validate_absolute_path($ssl_key)
     validate_hash($ssl_ca_certs)
   }
+  # schema_file may be undef
+  validate_string($suffix)
 
   $setup_inf_name = "setup_${title}.inf"
   $setup_inf_path = "${::port389::setup_dir}/${setup_inf_name}"
