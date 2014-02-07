@@ -88,21 +88,11 @@ define port389::instance::ssl (
     content => "Internal (Software) Token:${root_dn_pwd}",
   }
 
-  nssdb::create { $certdir:
-    owner_id       => $::port389::user,
-    group_id       => $::port389::group,
-    mode           => '0660',
-    password       => $root_dn_pwd,
-    manage_certdir => false,
-  }
-
-  nssdb::add_cert_and_key { $certdir:
-    nickname => 'Server-Cert',
-    cert     => $ssl_cert,
-    key      => $ssl_key,
-  }
-
-  if size(keys($ssl_ca_certs)) > 0 {
-    port389_nssdb_add_cert("/etc/dirsrv/slapd-${name}", $ssl_ca_certs)
+  port389::certs{ $name:
+    certdir      => $certdir,
+    nss_password => $root_dn_pwd,
+    ssl_cert     => $ssl_cert,
+    ssl_key      => $ssl_key,
+    ssl_ca_certs => $ssl_ca_certs,
   }
 }
