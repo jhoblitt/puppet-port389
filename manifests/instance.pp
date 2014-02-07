@@ -131,6 +131,13 @@ define port389::instance (
         }
       }
 
+      if $::port389::enable_server_admin_ssl {
+        include port389::admin::ssl
+
+        Exec["setup-ds-admin.pl_${title}"] ->
+        Class['port389::admin::ssl']
+      }
+
       # XXX this is extremely RedHat specific
       service { $title:
         ensure     => 'running',
