@@ -99,6 +99,7 @@ define port389::instance::ssl (
   port389::certs{ $name:
     certdir      => $certdir,
     nss_password => $root_dn_pwd,
+    ssl_nickname => 'Server-Cert',
     ssl_cert     => $ssl_cert,
     ssl_key      => $ssl_key,
     ssl_ca_certs => $ssl_ca_certs,

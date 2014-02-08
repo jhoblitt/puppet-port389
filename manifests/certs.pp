@@ -2,6 +2,7 @@
 define port389::certs (
   $certdir,
   $nss_password,
+  $ssl_nickname,
   $ssl_cert,
   $ssl_key,
   $ssl_ca_certs,
@@ -9,6 +10,7 @@ define port389::certs (
   validate_absolute_path($certdir)
   validate_string($nss_password)
   validate_absolute_path($ssl_cert)
+  validate_string($ssl_nickname)
   validate_absolute_path($ssl_key)
   validate_hash($ssl_ca_certs)
 
@@ -25,7 +27,7 @@ define port389::certs (
   }
 
   nssdb::add_cert_and_key { $certdir:
-    nickname => 'Server-Cert',
+    nickname => $ssl_nickname,
     cert     => $ssl_cert,
     key      => $ssl_key,
   }

@@ -1,0 +1,12 @@
+dn: cn=slapd-ldap1,cn=389 Directory Server,cn=Server Group,cn=main.vm,ou=sdm.noao.edu,o=NetscapeRoot
+changetype: modify
+replace: nsServerSecurity
+nsServerSecurity: on
+-
+replace: nsSecureServerPort
+nsSecureServerPort: <%= @ssl_server_port %>
+
+dn: cn=configuration,cn=admin-serv-main,cn=389 Administration Server,cn=Server Group,cn=main.vm,ou=sdm.noao.edu,o=NetscapeRoot 
+changetype: modify
+replace: nsServerSecurity
+nsServerSecurity: on
