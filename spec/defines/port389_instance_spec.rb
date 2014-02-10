@@ -42,7 +42,7 @@ describe 'port389::instance', :type => :define do
 [General]
 AdminDomain=foo.example.org
 ConfigDirectoryAdminID=admin
-ConfigDirectoryAdminPwd=admin
+ConfigDirectoryAdminPwd=password
 ConfigDirectoryLdapURL=ldap://bar.foo.example.org:389/o=NetscapeRoot
 FullMachineName=bar.foo.example.org
 ServerRoot=/usr/lib64/dirsrv
@@ -51,7 +51,7 @@ SuiteSpotUserID=nobody
 [admin]
 Port=9830
 ServerAdminID=admin
-ServerAdminPwd=admin
+ServerAdminPwd=password
 ServerIpAddress=0.0.0.0
 SysUser=nobody
 [slapd]
@@ -59,7 +59,7 @@ AddOrgEntries=No
 AddSampleEntries=No
 InstallLdifFile=
 RootDN=cn=Directory Manager
-RootDNPwd=admin
+RootDNPwd=password
 ServerIdentifier=ldap1
 ServerPort=389
 SlapdConfigForMC=yes

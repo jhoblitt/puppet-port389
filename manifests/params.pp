@@ -42,19 +42,19 @@ class port389::params {
   # general section defaults
   $admin_domain               = $::domain
   $config_directory_admin_id  = 'admin'
-  $config_directory_admin_pwd = $config_directory_admin_id
+  $config_directory_admin_pwd = 'password'
   $config_directory_ldap_url  = "ldap://${::fqdn}:389/o=NetscapeRoot"
   $full_machine_name          = $::fqdn
 
   # admin section defaults
   $server_admin_port = '9830'
   $server_admin_id   = 'admin'
-  $server_admin_pwd  = $server_admin_id
+  $server_admin_pwd  = 'password'
   $server_ipaddress  = '0.0.0.0'
 
   # slapd section defaults
   $root_dn     = 'cn=Directory Manager'
-  $root_dn_pwd = 'admin'
+  $root_dn_pwd = 'password'
   $server_port = '389'
 
   # the dir under which setup-ds-admin.pl .inf files will be created and stored

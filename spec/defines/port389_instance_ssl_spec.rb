@@ -72,7 +72,7 @@ nsslapd-secureport: 636
           :owner   => 'nobody',
           :group   => 'nobody',
           :mode    => '0400',
-          :content => 'Internal (Software) Token:admin',
+          :content => 'Internal (Software) Token:password',
         })
       end
 
@@ -81,7 +81,7 @@ nsslapd-secureport: 636
           :owner_id       => 'nobody',
           :group_id       => 'nobody',
           :mode           => '0600',
-          :password       => 'admin',
+          :password       => 'password',
           :manage_certdir => false,
         })
       end
