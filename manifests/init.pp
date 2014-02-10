@@ -56,7 +56,6 @@ class port389(
   validate_string($root_dn_pwd)
   validate_string($server_port)
   validate_string($setup_dir)
-  validate_string($suffix)
   # ssl
   validate_bool($enable_ssl)
   validate_bool($enable_server_admin_ssl)

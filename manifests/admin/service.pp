@@ -5,8 +5,8 @@ class port389::admin::service {
   }
 
   service { 'dirsrv-admin':
-    enable     => true,
     ensure     => 'running',
+    enable     => true,
     hasstatus  => true,
     hasrestart => true,
   }

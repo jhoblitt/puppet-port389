@@ -1,3 +1,4 @@
+# port389::instance
 define port389::instance (
   $admin_domain               = $::port389::admin_domain,
   $config_directory_admin_id  = $::port389::config_directory_admin_id,

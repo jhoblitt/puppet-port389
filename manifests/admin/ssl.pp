@@ -47,7 +47,7 @@ class port389::admin::ssl {
   #
   # nss.conf
   #
-  file { "admin-pin.txt":
+  file { 'admin-pin.txt':
     ensure  => file,
     path    => "${certdir}/pin.txt",
     owner   => $::port389::user,
@@ -69,7 +69,7 @@ class port389::admin::ssl {
   #
 
   #  NSSEngine [off|on] - set to on to enable the Admin Server to use https
-  #  (SSL/TLS) instead of http, off otherwise 
+  #  (SSL/TLS) instead of http, off otherwise
   file_line { 'NSSEngine':
     path  => "${admindir}/console.conf",
     line  => 'NSSEngine on',
@@ -78,7 +78,7 @@ class port389::admin::ssl {
 
   # NSSNickname [server-cert] - this is the nickname of the Admin Server cert
   # in it's cert/key database - server-cert is the default and the one created
-  # by the script above 
+  # by the script above
   file_line { 'NSSNickname':
     path  => "${admindir}/console.conf",
     line  => "NSSNickname ${nickname}",
