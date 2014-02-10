@@ -1,8 +1,0 @@
-dn: cn=RSA,cn=encryption,cn=config
-changetype: add
-objectclass: top
-objectclass: nsEncryptionModule
-cn: RSA
-nsSSLPersonalitySSL: Server-Cert
-nsSSLToken: internal (software)
-nsSSLActivation: on

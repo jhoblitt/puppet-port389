@@ -24,36 +24,23 @@ describe 'port389::instance', :type => :define do
       end
 
       it do
-        should contain_file('ssl_enable.ldif').with({
+        should contain_file('enable_ssl.ldif').with({
           :ensure => 'file',
-          :path   => '/var/lib/dirsrv/setup/ssl_enable.ldif',
-          :owner  => 'root',
-          :group  => 'root',
-          :mode   => '0640',
-          :source => 'puppet:///modules/port389/ssl_enable.ldif',
+          :path   => '/var/lib/dirsrv/setup/enable_ssl.ldif',
+          :owner  => 'nobody',
+          :group  => 'nobody',
+          :mode   => '0600',
           :backup => false,
         })
       end
 
       it do
-        should contain_file('addRSA.ldif').with({
-          :ensure => 'file',
-          :path   => '/var/lib/dirsrv/setup/addRSA.ldif',
-          :owner  => 'root',
-          :group  => 'root',
-          :mode   => '0640',
-          :source => 'puppet:///modules/port389/addRSA.ldif',
-          :backup => false,
-        })
-      end
-
-      it do
-        should contain_file('set_secureport_ldap1.ldif').with({
+        should contain_file('ldap1-set_secureport.ldif').with({
           :ensure  => 'file',
-          :path    => '/var/lib/dirsrv/setup/set_secureport_ldap1.ldif',
-          :owner   => 'root',
-          :group   => 'root',
-          :mode    => '0640',
+          :path    => '/var/lib/dirsrv/setup/ldap1-set_secureport.ldif',
+          :owner   => 'nobody',
+          :group   => 'nobody',
+          :mode    => '0600',
           :backup  => false,
           :content => <<-EOS
 dn: cn=config
@@ -65,28 +52,21 @@ nsslapd-secureport: 636
       end
 
       it do
-        should contain_exec('ssl_enable.ldif-ldap1').with({
+        should contain_exec('ldap1-enable_ssl.ldif').with({
           :path      => [ '/bin', '/usr/bin' ],
           :logoutput => true,
         })
       end
 
       it do
-        should contain_exec('addRSA.ldif-ldap1').with({
+        should contain_exec('ldap1-set_secureport.ldif').with({
           :path      => [ '/bin', '/usr/bin' ],
           :logoutput => true,
         })
       end
 
       it do
-        should contain_exec('set_secureport_ldap1.ldif').with({
-          :path      => [ '/bin', '/usr/bin' ],
-          :logoutput => true,
-        })
-      end
-
-      it do
-        should contain_file('pin.txt-ldap1').with({
+        should contain_file('ldap1-pin.txt').with({
           :ensure  => 'file',
           :path    => '/etc/dirsrv/slapd-ldap1/pin.txt',
           :owner   => 'nobody',
@@ -100,7 +80,7 @@ nsslapd-secureport: 636
         should contain_nssdb__create('/etc/dirsrv/slapd-ldap1').with({
           :owner_id       => 'nobody',
           :group_id       => 'nobody',
-          :mode           => '0660',
+          :mode           => '0600',
           :password       => 'admin',
           :manage_certdir => false,
         })
@@ -142,13 +122,13 @@ nsslapd-secureport: 636
     context 'false' do
       let(:params) {{ :enable_ssl  => false }}
 
-      it { should_not contain_file('ssl_enable.ldif') }
-      it { should_not contain_file('addRSA.ldif') }
-      it { should_not contain_exec('ssl_enable.ldif-ldap1') }
-      it { should_not contain_exec('addRSA.ldif-ldap1') }
+      it { should_not contain_file('enable_ssl_enable.ldif') }
+      it { should_not contain_exec('ldap1-enable_ssl.ldif') }
       it { should_not contain_file('pin.txt-ldap1') }
       it { should_not contain_nssdb__create('/etc/dirsrv/slapd-ldap1') }
       it { should_not contain_nssdb__add_cert_and_key('/etc/dirsrv/slapd-ldap1') }
+      it { should_not contain_nssdb__add_cert('/etc/dirsrv/slapd-ldap1-AlphaSSL CA') }
+      it { should_not contain_nssdb__add_cert('/etc/dirsrv/slapd-ldap1-GlobalSign Root CA') }
     end # false
 
     context 'foo' do

@@ -11,8 +11,17 @@ nsSSL3Ciphers: -rsa_null_md5,+rsa_rc4_128_md5,+rsa_rc4_40_md5,+rsa_rc2_40_md5,+r
 
 dn: cn=config
 changetype: modify
-add: nsslapd-security
+replace: nsslapd-security
 nsslapd-security: on
 -
 replace: nsslapd-ssl-check-hostname
 nsslapd-ssl-check-hostname: off
+
+dn: cn=RSA,cn=encryption,cn=config
+changetype: add
+objectclass: top
+objectclass: nsEncryptionModule
+cn: RSA
+nsSSLPersonalitySSL: Server-Cert
+nsSSLToken: internal (software)
+nsSSLActivation: on

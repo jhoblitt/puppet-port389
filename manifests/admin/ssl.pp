@@ -26,8 +26,8 @@ class port389::admin::ssl {
   file { 'enable_admin_ssl.ldif':
     ensure  => file,
     path    => "${::port389::setup_dir}/enable_admin_ssl.ldif",
-    owner   => 'root',
-    group   => 'root',
+    owner   => $::port389::user,
+    group   => $::port389::group,
     mode    => '0600',
     content => template("${module_name}/enable_admin_ssl.ldif.erb"),
     backup  => false,
@@ -47,7 +47,7 @@ class port389::admin::ssl {
   #
   # nss.conf
   #
-  file { "pin.txt-admin":
+  file { "admin-pin.txt":
     ensure  => file,
     path    => "${certdir}/pin.txt",
     owner   => $::port389::user,

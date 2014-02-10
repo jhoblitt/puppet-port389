@@ -21,7 +21,7 @@ define port389::certs (
   nssdb::create { $certdir:
     owner_id       => $::port389::user,
     group_id       => $::port389::group,
-    mode           => '0660',
+    mode           => '0600',
     password       => $nss_password,
     manage_certdir => false,
   }
