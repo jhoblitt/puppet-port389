@@ -59,8 +59,10 @@ class port389(
   validate_string($suffix)
   # ssl
   validate_bool($enable_ssl)
-  # don't validate ssl_* params unless $enable_ssl == true
-  if $enable_ssl {
+  validate_bool($enable_server_admin_ssl)
+  # don't validate ssl_* params unless $enable_ssl or enable_server_admin_ssl
+  # == true
+  if $enable_ssl or $enable_server_admin_ssl {
     validate_string($ssl_server_port)
     validate_absolute_path($ssl_cert)
     validate_absolute_path($ssl_key)
