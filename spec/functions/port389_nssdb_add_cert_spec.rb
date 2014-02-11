@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe 'port389_nssdb_add_cert', :type => :puppet_function do
+describe 'port389_nsstools_add_cert', :type => :puppet_function do
   it 'should fail with < 2 param' do
     expect { subject.call([1]) }.to raise_error(/Wrong number of arguments/)
   end
@@ -26,12 +26,12 @@ describe 'port389_nssdb_add_cert', :type => :puppet_function do
       }
     )
 
-    alpha = catalogue.resource('Nssdb::Add_cert', '/etc/dirsrv/slapd-ldap1-AlphaSSL CA')
+    alpha = catalogue.resource('Nsstools::Add_cert', '/etc/dirsrv/slapd-ldap1-AlphaSSL CA')
     alpha[:nickname].should eq 'AlphaSSL CA'
     alpha[:certdir].should  eq '/etc/dirsrv/slapd-ldap1'
     alpha[:cert].should     eq '/tmp/alphassl_intermediate.pem'
 
-    global = catalogue.resource('Nssdb::Add_cert', '/etc/dirsrv/slapd-ldap1-GlobalSign Root CA')
+    global = catalogue.resource('Nsstools::Add_cert', '/etc/dirsrv/slapd-ldap1-GlobalSign Root CA')
     global[:nickname].should eq 'GlobalSign Root CA'
     global[:certdir].should  eq '/etc/dirsrv/slapd-ldap1'
     global[:cert].should     eq '/tmp/globalsign_root.pem'

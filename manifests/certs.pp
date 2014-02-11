@@ -18,21 +18,21 @@ define port389::certs (
     fail("Use of private class ${name} by ${caller_module_name}")
   }
 
-  nssdb::create { $certdir:
-    owner_id       => $::port389::user,
-    group_id       => $::port389::group,
+  nsstools::create { $certdir:
+    owner          => $::port389::user,
+    group          => $::port389::group,
     mode           => '0600',
     password       => $nss_password,
     manage_certdir => false,
   }
 
-  nssdb::add_cert_and_key { $certdir:
-    nickname => $ssl_nickname,
+  nsstools::add_cert_and_key { $ssl_nickname:
+    certdir  => $certdir,
     cert     => $ssl_cert,
     key      => $ssl_key,
   }
 
   if size(keys($ssl_ca_certs)) > 0 {
-    port389_nssdb_add_cert($certdir, $ssl_ca_certs)
+    port389_nsstools_add_cert($certdir, $ssl_ca_certs)
   }
 }

@@ -6,8 +6,7 @@ fixtures:
     limits: 'https://github.com/saz/puppet-limits.git'
     augeasproviders: 'https://github.com/hercules-team/augeasproviders.git'
     openldap: 'https://github.com/mcanevet/puppet-openldap.git'
-    nssdb:
-      repo: 'https://github.com/jhoblitt/puppet-nssdb.git'
-      ref:  '1be003431c3f612483756a26eebf13cfa14d18a9'
+    nsstools: 'https://github.com/jhoblitt/puppet-nsstools.git'
+    openssl: 'https://github.com/camptocamp/puppet-openssl.git'
   symlinks:
     port389: "#{source_dir}"
