@@ -33,6 +33,6 @@ define port389::certs (
   }
 
   if size(keys($ssl_ca_certs)) > 0 {
-    port389_nsstools_add_cert($certdir, $ssl_ca_certs)
+    nsstools_add_cert($certdir, $ssl_ca_certs)
   }
 }
