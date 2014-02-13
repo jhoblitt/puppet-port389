@@ -37,19 +37,20 @@ describe provider_class, :as_platform => :posix do
   # test self.instances
   describe "when getting all service instances" do
     before :each do
-      @services = ['one', 'two', 'three', 'four', 'kudzu', 'functions', 'halt', 'killall', 'single', 'linuxconf', 'boot', 'reboot']
-      @not_services = ['functions', 'halt', 'killall', 'single', 'linuxconf', 'reboot', 'boot']
+      @services = ['one', 'two', 'three', 'four']
       Dir.stubs(:entries).returns @services
       FileTest.stubs(:directory?).returns(true)
       FileTest.stubs(:executable?).returns(true)
     end
+
     it "should return instances for all services" do
-      (@services-@not_services).each do |inst|
+      (@services).each do |inst|
         @class.expects(:new).with{|hash| hash[:name] == inst && hash[:path] == '/etc/init.d'}.returns("#{inst}_instance")
       end
-      results = (@services-@not_services).collect {|x| "#{x}_instance"}
+      results = (@services).collect {|x| "#{x}_instance"}
       @class.instances.should == results
     end
+
     it "should call service status when initialized from provider" do
       @resource.stubs(:[]).with(:status).returns nil
       @provider.stubs(:get).with(:hasstatus).returns true
