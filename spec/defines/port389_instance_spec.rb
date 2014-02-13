@@ -119,7 +119,7 @@ ds_bename=userRoot
               :group   => 'nobody',
               :mode    => '0600',
               :backup  => false,
-              :content => /SchemaFile=#{files}/
+              :content => /SchemaFile=#{f}/
             })
           end
         end
