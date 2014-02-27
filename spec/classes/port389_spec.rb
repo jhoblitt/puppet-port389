@@ -35,7 +35,7 @@ describe 'port389', :type => :class do
     ]
 
     context 'param defaults' do
-      it_should_behave_like 'been_tuned'
+      it { should_not contain_class('port389::tune') }
       it('should include package dependency') { should contain_package('httpd') }
       redhat_packages.each do |pkg|
         it('should include package') { should contain_package(pkg) }
@@ -54,7 +54,7 @@ describe 'port389', :type => :class do
       context 'present' do
         let(:params) {{ :ensure => 'present' }}
 
-        it_should_behave_like 'been_tuned'
+        it { should_not contain_class('port389::tune') }
         redhat_packages.each do |pkg|
           it { should contain_package(pkg).with_ensure('present') }
         end
@@ -71,7 +71,7 @@ describe 'port389', :type => :class do
       context 'latest' do
         let(:params) {{ :ensure => 'latest' }}
 
-        it_should_behave_like 'been_tuned'
+        it { should_not contain_class('port389::tune') }
         redhat_packages.each do |pkg|
           it { should contain_package(pkg).with_ensure('latest') }
         end

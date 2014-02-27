@@ -32,8 +32,8 @@ class port389::params {
   # of it
   $package_ensure = 'httpd'
 
-  # this might need to be turned off by default on some platforms
-  $enable_tuning = true
+  # this should be off by default due to it's intrusiveness
+  $enable_tuning = false
 
   # uid/gid
   $user  = 'nobody'

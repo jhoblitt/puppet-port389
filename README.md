@@ -94,7 +94,7 @@ class { 'port389':
     '389-ds-console',
     '389-ds-console-doc',
   ],
-  enable_tuning              => true,
+  enable_tuning              => false,
   user                       => 'nobody',
   group                      => 'nobody',
   admin_domain               => $::domain,
@@ -144,9 +144,9 @@ class { 'port389':
 
  * `enable_tuning`
 
-    `Bool` defaults to `true`
+    `Bool` defaults to `false`
 
-    Enables/disable automatically tuning the system per the RedHat Directory Server 9.0 Performance Tuning Guide section on [Optimizing System Performance](https://access.redhat.com/site/documentation/en-US/Red_Hat_Directory_Server/9.0/html/Performance_Tuning_Guide/system-tuning.html).
+    Enables/disable automatically tuning the system per the Red Hat Directory Server 9.0 Performance Tuning Guide section on [Optimizing System Performance](https://access.redhat.com/site/documentation/en-US/Red_Hat_Directory_Server/9.0/html/Performance_Tuning_Guide/system-tuning.html).
 
  * `user`
 
