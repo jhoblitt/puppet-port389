@@ -65,6 +65,6 @@ class port389::tune {
   # echo "1024 65000" > /proc/sys/net/ipv4/ip_local_port_range
   sysctl { 'net.ipv4.ip_local_port_range':
     ensure => present,
-    value  => '1024 65000',
+    value  => "1024\t65000",
   }
 }
