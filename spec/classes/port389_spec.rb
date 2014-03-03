@@ -48,6 +48,12 @@ describe 'port389', :type => :class do
           :mode   => '0700',
         })
       end
+      it 'should enable dirsrv' do
+        should contain_service('dirsrv').with({
+          :ensure => 'running',
+          :enable => true,
+        }).that_comes_before('Anchor[port389::end]')
+      end
     end # param defaults
 
     context 'ensure =>' do
