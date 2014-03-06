@@ -168,18 +168,18 @@ See the Red Hat Directory Server 9.0 Installation Guide's section on [Silent
 Setup](https://access.redhat.com/site/documentation/en-US/Red_Hat_Directory_Server/9.0/html/Installation_Guide/Advanced_Configuration-Silent.html)
 for a listing of all `.inf` file keys.
 
- * `admin_domain`
- * `config_directory_admin_id`
- * `config_directory_admin_pwd`
- * `config_directory_ldap_url`
- * `full_machine_name`
- * `server_admin_port`
- * `server_admin_id`
- * `server_admin_pwd`
- * `server_ipaddress`
- * `root_dn`
- * `root_dn_pwd`
- * `server_port`
+     * `admin_domain`
+     * `config_directory_admin_id`
+     * `config_directory_admin_pwd`
+     * `config_directory_ldap_url`
+     * `full_machine_name`
+     * `server_admin_port`
+     * `server_admin_id`
+     * `server_admin_pwd`
+     * `server_ipaddress`
+     * `root_dn`
+     * `root_dn_pwd`
+     * `server_port`
 
  * `setup_dir`
 
@@ -256,6 +256,7 @@ The following parameters are ignored unless `enable_ssl` or
 ##Types
 
 ```puppet
+#defaults
 port389::instance { <title>:
   $admin_domain               = $::port389::admin_domain,
   $config_directory_admin_id  = $::port389::config_directory_admin_id,
@@ -264,31 +265,87 @@ port389::instance { <title>:
   $root_dn                    = $::port389::root_dn,
   $root_dn_pwd                = $::port389::root_dn_pwd,
   $server_port                = $::port389::server_port,
+  $schema_file                = undef,
+  $suffix                     = port389_domain2dn($::port389::admin_domain),
   $enable_ssl                 = $::port389::enable_ssl,
   $ssl_server_port            = $::port389::ssl_server_port,
   $ssl_cert                   = $::port389::ssl_cert,
   $ssl_key                    = $::port389::ssl_key,
   $ssl_ca_certs               = $::port389::ssl_ca_certs,
-  $schema_file                = undef,
-  $suffix                     = port389_domain2dn($::port389::admin_domain),
 }
-
 ```
 
- * `admin_domain`
- * `config_directory_admin_id`
- * `config_directory_admin_pwd`
- * `config_directory_ldap_url`
- * `root_dn`
- * `root_dn_pwd`
- * `server_port`
- * `enable_ssl`
- * `ssl_server_port`
- * `ssl_cert`
- * `ssl_key`
- * `ssl_ca_certs`
+The following parameters directly control values in the `.inf` file passed to
+`setup-ds-admin.pl` to create directory service instances.  CamelCase `.inf`
+keys are represented as lowercase parameters names with `_`s between words.
+Eg.
+
+See the Red Hat Directory Server 9.0 Installation Guide's section on [Silent
+Setup](https://access.redhat.com/site/documentation/en-US/Red_Hat_Directory_Server/9.0/html/Installation_Guide/Advanced_Configuration-Silent.html)
+for a listing of all `.inf` file keys.
+
+     * `admin_domain`
+     * `config_directory_admin_id`
+     * `config_directory_admin_pwd`
+     * `config_directory_ldap_url`
+     * `root_dn`
+     * `root_dn_pwd`
+     * `server_port`
+     * `schema_file`
+     * `suffix`
+
  * `schema_file`
- * `suffix`
+
+    `String|Array` defaults to 'undef'
+
+    Note that this paramter may except an array of absolute paths to schema
+    files to be used when creating a new ldap instance.
+
+ * `enable_ssl`
+
+    `Bool` defaults to `false`
+
+    Enables/disables setup of SSL/TLS connections to the directory server.
+
+    If set, these paramters are manadatory:
+
+        * `ssl_server_port`
+        * `ssl_cert`
+        * `ssl_key`
+        * `ssl_ca_certs`
+
+ * `ssl_server_port`
+
+    `String` defaults to `636`
+
+    Sets the port used for `LDAPS` connections.
+
+ * `ssl_cert`
+
+    `String`/aboslute path defaults to `undef`
+
+    Path to the `.pem` format certificate to use for SSL/TLS connections.
+
+ * `ssl_key`
+
+    `String`/aboslute path defaults to `undef`
+
+    Path to the `.pem` format key to use for SSL/TLS connections.
+
+ * `ssl_ca_certs`
+
+    `Hash` defaults to `{}`
+
+    Nickname / absolute path pairs to any chained certificate authority (CA)
+    certs that may be needed.
+
+    ```
+    {
+      'AlphaSSL CA'        => '/tmp/alphassl_intermediate.pem',
+      'GlobalSign Root CA' => '/tmp/globalsign_root.pem',
+    }
+    ```
+
 
 Functions
 ---------
