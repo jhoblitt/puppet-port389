@@ -65,7 +65,7 @@ class { 'port389':
     'AlphaSSL CA'        => '/var/sdm/certificates/alphassl/alphassl_intermediate.pem',
     'GlobalSign Root CA' => '/var/sdm/certificates/alphassl/globalsign_root.pem',
   },
-  require                    => Class['augeas']],
+  require                    => Class['augeas'],
 }
 
 port389::instance { 'ldap1':
