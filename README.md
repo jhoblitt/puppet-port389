@@ -45,10 +45,10 @@ for so called unattneded installs.
 ##Example
 
 ```puppet
-# java is needed if you want to use the 389-console, no needed for installation
+# java is needed if you want to use the 389-console, otherwise - no needed for installation
 include java
 
-# augeasprovides must be in a working state to enable server tuning
+# augeasproviders must be in a working state to enable server tuning
 include augeas
 
 class { 'port389':
@@ -62,8 +62,8 @@ class { 'port389':
   ssl_cert                   => '/tmp/example.org.pem',
   ssl_key                    => '/tmp/example.org.key',
   ssl_ca_certs               => {
-    'AlphaSSL CA'        => '/var/sdm/certificates/alphassl/alphassl_intermediate.pem',
-    'GlobalSign Root CA' => '/var/sdm/certificates/alphassl/globalsign_root.pem',
+    'AlphaSSL CA'        => '/tmp/alphassl_intermediate.pem',
+    'GlobalSign Root CA' => '/tmp/globalsign_root.pem',
   },
   require                    => Class['augeas'],
 }
