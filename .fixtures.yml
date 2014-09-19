@@ -4,7 +4,9 @@ fixtures:
       repo: 'https://github.com/puppetlabs/puppetlabs-stdlib.git'
       ref:  '4.0.0'
     limits: 'https://github.com/saz/puppet-limits.git'
-    augeasproviders: 'https://github.com/hercules-team/augeasproviders.git'
+    augeasproviders:
+      repo: 'https://github.com/hercules-team/augeasproviders.git'
+      ref: 'v1.2.0'
     openldap: 'https://github.com/mcanevet/puppet-openldap.git'
     nsstools: 'https://github.com/jhoblitt/puppet-nsstools.git'
     openssl: 'https://github.com/camptocamp/puppet-openssl.git'
