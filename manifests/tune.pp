@@ -4,8 +4,6 @@ class port389::tune {
     fail("Use of private class ${name} by ${caller_module_name}")
   }
 
-  include 'limits'
-
   # per
   # https://access.redhat.com/site/documentation/en-US/Red_Hat_Directory_Server/9.0/html/Performance_Tuning_Guide/system-tuning.html
 
