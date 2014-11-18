@@ -27,9 +27,9 @@ define port389::certs (
   }
 
   nsstools::add_cert_and_key { $ssl_nickname:
-    certdir  => $certdir,
-    cert     => $ssl_cert,
-    key      => $ssl_key,
+    certdir => $certdir,
+    cert    => $ssl_cert,
+    key     => $ssl_key,
   }
 
   if size(keys($ssl_ca_certs)) > 0 {
