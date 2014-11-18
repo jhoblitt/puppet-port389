@@ -30,7 +30,7 @@ describe provider_class, :as_platform => :posix do
   [ 'RedHat', 'Suse' ].each do |osfamily|
     it "should not be the default provider on #{osfamily}" do
       #Facter.expects(:value).with(:osfamily).returns(osfamily)
-      provider_class.default?.should be_false
+      provider_class.default?.should be false
     end
   end
 
