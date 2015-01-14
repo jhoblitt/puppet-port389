@@ -2,7 +2,6 @@ require 'spec_helper'
 
 describe 'port389', :type => :class do
   shared_examples 'been_tuned' do
-    it { should contain_class('limits') }
     it { should contain_sysctl('fs.file-max') }
     it { should contain_limits__limits('all_both_nofile') }
     it { should contain_limits__limits('nobody_soft_nofile') }
