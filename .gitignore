@@ -7,3 +7,5 @@ pkg/
 spec/fixtures/manifests/
 spec/fixtures/modules/
 *.swp
+.vagrant
+log/
