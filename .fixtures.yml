@@ -2,7 +2,7 @@ fixtures:
   repositories:
     stdlib:
       repo: 'https://github.com/puppetlabs/puppetlabs-stdlib.git'
-      ref:  '4.0.0'
+      ref:  '4.6.0'
     limits: 'https://github.com/saz/puppet-limits.git'
     augeasproviders:
       repo: 'https://github.com/hercules-team/augeasproviders.git'
