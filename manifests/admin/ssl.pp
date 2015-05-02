@@ -4,7 +4,7 @@ class port389::admin::ssl {
     fail("Use of private class ${name} by ${caller_module_name}")
   }
 
-  Class['port389::admin::ssl']{ notify => Class['port389::admin::service'] }
+  Class['port389::admin::ssl'] -> Class['port389::admin::service']
 
   # per
   # http://directory.fedoraproject.org/wiki/Howto:SSL#Admin_Server_SSL_Information
