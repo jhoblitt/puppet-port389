@@ -1,7 +1,7 @@
 
 #### [Current]
 
-#### 
+####
  * [435a443](../../commit/435a443) - __(Joshua Hoblitt)__ Update README.md
  * [c305f77](../../commit/c305f77) - __(Joshua Hoblitt)__ Update README.md
  * [49b24b6](../../commit/49b24b6) - __(Joshua Hoblitt)__ add additional details to README

@@ -17,7 +17,7 @@ Would become:
       raise(Puppet::ParseError, "port389_domain2dn(): Wrong number of arguments "+
         "given #{args.size} for 1")
     end
-    
+
     args[0].split('.').map{ |x| "dc=" + x }.join(',')
   end
 end

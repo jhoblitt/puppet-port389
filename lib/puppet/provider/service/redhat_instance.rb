@@ -17,7 +17,7 @@ Given a init.d scritpt that behaves like:
 
 Eg.:
 
-    $ sudo /etc/init.d/dirsrv status 
+    $ sudo /etc/init.d/dirsrv status
     dirsrv ldap1 is stopped
     dirsrv ldap2 (pid 5604) is running...
     $ sudo /etc/init.d/dirsrv status ldap1
@@ -54,7 +54,7 @@ EOS
   undef_method :enable
   undef_method :disable
   undef_method :enabled?
-  
+
   # this provider should never be the default
   # XXX unsure of the "proper" way to remove the defaultfor from the base class
   # undef_method :defaultfor
