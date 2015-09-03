@@ -93,7 +93,12 @@ define port389::instance (
       #'tmp_dir' => '/tmp',
     },
   }
-
+  if versioncmp($::operatingsystemrelease,'7.0') < 0 {
+    $servicename = $title
+  } else {
+    $servicename = "dirsrv@${title}"
+  }
+  
   case $::port389::ensure {
     'present', 'latest': {
       # disable bucketting since the .inf file contains password information
@@ -115,7 +120,7 @@ define port389::instance (
         command   => "setup-ds-admin.pl --file=${setup_inf_path} --silent",
         unless    => "/usr/bin/test -e /etc/dirsrv/slapd-${title}",
         logoutput => true,
-        notify    => Service[ "dirsrv@${title}"],
+        notify    => Service[ $servicename ],
       }
 
       if $enable_ssl {
@@ -128,7 +133,7 @@ define port389::instance (
           ssl_cert        => $ssl_cert,
           ssl_key         => $ssl_key,
           ssl_ca_certs    => $ssl_ca_certs,
-          notify          => Service[ "dirsrv@${title}"],
+          notify          => Service[ $servicename],
         }
       }
 
@@ -144,14 +149,22 @@ define port389::instance (
         Class['port389::admin::ssl'] ->
         Class['port389::admin::service']
       }
-
-      # XXX this is extremely RedHat specific
-      service { "dirsrv@${title}":
-        ensure     => 'running',
-        #control    => 'dirsrv',
-        hasstatus  => true,
-        hasrestart => true,
-        #provider   => 'redhat_instance',
+      
+      if versioncmp($::operatingsystemrelease,'7.0') < 0 { 
+        # XXX this is extremely RedHat specific
+        service { $title :
+          ensure     => 'running',
+          control    => 'dirsrv',
+          hasstatus  => true,
+          hasrestart => true,
+          provider   => 'redhat_instance',
+        }
+      } else {
+        service { $servicename :
+          ensure     => 'running',
+          hasstatus  => true,
+          hasrestart => true,
+         } 
       }
     }
     default: {
