@@ -7,6 +7,9 @@ class port389::params {
     }
   }
 
+
+  # we only support redhat, assuming we are on EL
+  if versioncmp($::operatingsystemrelease,'7.0') < 0 {
   # console also requires java
   $package_name = [
     '389-admin',
@@ -25,7 +28,24 @@ class port389::params {
     '389-ds-console-doc',
     '389-dsgw',
     #'389-dsgw-debuginfo',
-  ]
+    ] 
+  } else {
+    # EL 7, some packages are no longer in epel, some packages won't be availble until after 7.1
+    $package_name = [
+    '389-admin',
+    #'389-admin-console',
+    #'389-admin-console-doc',
+    #'389-admin-debuginfo',
+    '389-adminutil',
+    #'389-adminutil-debuginfo',
+    '389-adminutil-devel',
+    #'389-console',
+    #'389-ds',
+    '389-ds-base',
+    '389-ds-base-devel',
+    '389-ds-base-libs',
+    ]  
+  }
 
   # console requires /usr/sbin/httpd.worker provided by `httpd`
   # we need to ensure the presence of this package but do not want 'ownership'

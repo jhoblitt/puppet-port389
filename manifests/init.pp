@@ -87,12 +87,6 @@ class port389(
         mode   => '0700',
       } ->
       Port389::Instance<| |> ->
-      service { 'dirsrv':
-        ensure     => 'running',
-        enable     => true,
-        hasstatus  => true,
-        hasrestart => true,
-      } ->
       Anchor['port389::end']
     }
     # the global 'dirsrv' service is only managed for uninstall
