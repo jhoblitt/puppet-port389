@@ -117,7 +117,7 @@ define port389::instance (
       #   /usr/bin/env
       exec { "setup-ds-admin.pl_${title}":
         path      => [ '/bin', '/sbin', '/usr/bin', '/usr/sbin' ],
-        command   => "setup-ds-admin.pl --file=${setup_inf_path} --silent",
+        command   => "setup-ds-admin.pl --file=${setup_inf_path} --silent -ddddd",
         unless    => "/usr/bin/test -e /etc/dirsrv/slapd-${title}",
         logoutput => true,
         notify    => Service[ $servicename ],
