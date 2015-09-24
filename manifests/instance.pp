@@ -14,6 +14,7 @@ define port389::instance (
   $ssl_ca_certs               = $::port389::ssl_ca_certs,
   $schema_file                = undef,
   $suffix                     = port389_domain2dn($::port389::admin_domain),
+  $disable_selinux_config     = false,
 ) {
   # follow the same server identifier validation rules as setup-ds-admin.pl
   validate_re($title, '^[\w#%:@-]*$', "The ServerIdentifier '${title}' contains invalid characters.  It must contain only alphanumeric characters and the following: #%:@_-")
@@ -122,6 +123,21 @@ define port389::instance (
         logoutput => true,
         notify    => Service[ $servicename ],
       }
+      
+      notify {"Disable selinux config is $disable_selinux_config": }
+      if $disable_selinux_config {
+        notify {"Running sed exec": } ->
+        exec { "disable selinux with sed":
+          path      => [ '/bin', '/sbin', '/usr/bin', '/usr/sbin' ],
+          command   => "sed -i 's/sub updateSelinuxPolicy {/& return;/' /usr/lib64/dirsrv/perl/*.pm",
+          unless    => 'grep "sub updateSelinuxPolicy { return; /usr/lib64/dirsrv/perl/*.pm' ,
+          logoutput => true,
+          before    => Exec["setup-ds-admin.pl_${title}"],
+          require   => Package['389-admin'],
+        } ->
+        notify {"Ran sed exec": }
+      }
+      
 
       if $enable_ssl {
         Exec["setup-ds-admin.pl_${title}"] ->
