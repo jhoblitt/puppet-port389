@@ -15,6 +15,7 @@ define port389::instance (
   $schema_file                = undef,
   $suffix                     = port389_domain2dn($::port389::admin_domain),
   $disable_selinux_config     = false,
+  $disable_systemd_config     = false,
   $install_admin_server       = true,
   $start_server               = 'yes',
 ) {
@@ -148,7 +149,22 @@ define port389::instance (
         } ->
         notify {"Ran sed exec": }
       }
+
+      notify {"Disable systemd config is $disable_systemd_config": }
+      if $disable_systemd_config {
+        notify {"Running sed exec systemd": } ->
+        exec { "disable systemd with sed":
+          path      => [ '/bin', '/sbin', '/usr/bin', '/usr/sbin' ],
+          command   => "sed -i 's/sub updateSystemD {/& return;/' /usr/lib64/dirsrv/perl/*.pm",
+          unless    => 'grep "sub updateSystemD { return; /usr/lib64/dirsrv/perl/*.pm' ,
+          logoutput => true,
+          before    => Exec["${install_script}_${title}"],
+          require   => Package['389-ds-base'],
+        } ->
+        notify {"Ran sed exec systemd": }
+      }
       
+
 
       if $enable_ssl {
         Exec["${install_script}_${title}"] ->
