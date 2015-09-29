@@ -36,6 +36,7 @@ class port389(
   $ssl_cert                   = $::port389::params::ssl_cert,
   $ssl_key                    = $::port389::params::ssl_key,
   $ssl_ca_certs               = $::port389::params::ssl_ca_certs,
+  $main_service_name          = $::port389::params::main_service_name,
   $install_admin              = true,
 ) inherits port389::params {
   validate_re($ensure, '^present$|^absent$|^latest$|^purged$')
@@ -92,6 +93,12 @@ class port389(
         mode   => '0700',
       } ->
       Port389::Instance<| |> ->
+      service { $main_service_name:
+        ensure     => 'running',
+        enable     => true,
+        hasstatus  => true,
+        hasrestart => true,
+      } ->      
       Anchor['port389::end']
     }
     # the global 'dirsrv' service is only managed for uninstall

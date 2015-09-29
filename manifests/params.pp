@@ -7,6 +7,12 @@ class port389::params {
     }
   }
 
+  if versioncmp($::operatingsystemrelease,'7.0') < 0 {
+    $main_service_name = 'dirsrv'
+  } else {
+    $main_service_name = 'dirsrv.target'
+  }
+
   # we only support redhat, assuming we are on EL
   if versioncmp($::operatingsystemrelease,'7.0') < 0 {
   # console also requires java
