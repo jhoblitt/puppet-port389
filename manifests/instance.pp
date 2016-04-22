@@ -41,9 +41,9 @@ define port389::instance (
   validate_string($suffix)
 
   if $install_admin_server {
-    $install_script = "setup-ds-admin.pl" 
+    $install_script = 'setup-ds-admin.pl'
   } else {
-    $install_script = "setup-ds.pl"
+    $install_script = 'setup-ds.pl'
   }
 
   $setup_inf_name = "setup_${title}.inf"
@@ -83,7 +83,7 @@ define port389::instance (
       'Suffix'           => $suffix,
       'UseExistingMC'    => '0',
       'ds_bename'        => 'userRoot',
-      'start_server'     => $start_server, 
+      'start_server'     => $start_server,
       #'bak_dir' => '/var/lib/dirsrv/slapd-ldap1/bak',
       #'bindir' => '/usr/bin',
       #'cert_dir' => '/etc/dirsrv/slapd-ldap1',
@@ -109,9 +109,9 @@ define port389::instance (
   } else {
     $servicename = "dirsrv@${title}"
   }
-  
 
-  
+
+
   case $::port389::ensure {
     'present', 'latest': {
       # disable bucketting since the .inf file contains password information
@@ -130,16 +130,16 @@ define port389::instance (
       #   /usr/bin/env
       exec { "${install_script}_${title}":
         path      => [ '/bin', '/sbin', '/usr/bin', '/usr/sbin' ],
-        command   => "${install_script} --file=${setup_inf_path} --silent -ddddd",
+        command   => "${install_script} --file=${setup_inf_path} --silent",
         unless    => "/usr/bin/test -e /etc/dirsrv/slapd-${title}",
         logoutput => true,
         notify    => Service[ $servicename ],
       }
-      
-      notify {"Disable selinux config is $disable_selinux_config": }
+
+      notify {"Disable selinux config is ${disable_selinux_config}": }
       if $disable_selinux_config {
-        notify {"Running sed exec": } ->
-        exec { "disable selinux with sed":
+        notify {'Running sed exec': } ->
+        exec { 'disable selinux with sed':
           path      => [ '/bin', '/sbin', '/usr/bin', '/usr/sbin' ],
           command   => "sed -i 's/sub updateSelinuxPolicy {/& return;/' /usr/lib64/dirsrv/perl/*.pm",
           unless    => 'grep "sub updateSelinuxPolicy { return; /usr/lib64/dirsrv/perl/*.pm' ,
@@ -147,13 +147,13 @@ define port389::instance (
           before    => Exec["${install_script}_${title}"],
           require   => Package['389-ds-base'],
         } ->
-        notify {"Ran sed exec": }
+        notify {'Ran sed exec': }
       }
 
-      notify {"Disable systemd config is $disable_systemd_config": }
+      notify {"Disable systemd config is ${disable_systemd_config}": }
       if $disable_systemd_config {
-        notify {"Running sed exec systemd": } ->
-        exec { "disable systemd with sed":
+        notify {'Running sed exec systemd': } ->
+        exec { 'disable systemd with sed':
           path      => [ '/bin', '/sbin', '/usr/bin', '/usr/sbin' ],
           command   => "sed -i 's/sub updateSystemD {/& return;/' /usr/lib64/dirsrv/perl/*.pm",
           unless    => 'grep "sub updateSystemD { return; /usr/lib64/dirsrv/perl/*.pm' ,
@@ -161,9 +161,9 @@ define port389::instance (
           before    => Exec["${install_script}_${title}"],
           require   => Package['389-ds-base'],
         } ->
-        notify {"Ran sed exec systemd": }
+        notify {'Ran sed exec systemd': }
       }
-      
+
 
 
       if $enable_ssl {
@@ -181,10 +181,10 @@ define port389::instance (
       }
       if $install_admin_server {
         include port389::admin::service
-  
+
         Exec["${install_script}_${title}"] ->
         Class['port389::admin::service']
-  
+
         if $::port389::enable_server_admin_ssl {
           include port389::admin::ssl
 
@@ -194,7 +194,7 @@ define port389::instance (
         }
       }
 
-      if versioncmp($::operatingsystemrelease,'7.0') < 0 { 
+      if versioncmp($::operatingsystemrelease,'7.0') < 0 {
         # XXX this is extremely RedHat specific
         service { $title :
           ensure     => 'running',
@@ -208,7 +208,7 @@ define port389::instance (
           ensure     => 'running',
           hasstatus  => true,
           hasrestart => true,
-         } 
+        }
       }
     }
     default: {
