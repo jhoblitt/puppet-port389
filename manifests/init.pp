@@ -9,7 +9,11 @@
 class port389(
   $ensure                     = 'present',
   $package_ensure             = $::port389::params::package_ensure,
-  $package_name               = $::port389::params::package_name,
+  # these package name parameters can be arrays and they will be combined and installed
+  # 
+  $package_name               = $::port389::params::package_name, 
+  $package_name_admin         = $::port389::params::package_name_admin,  
+  $package_name_base          = $::port389::params::package_name_base,  
   $enable_tuning              = $::port389::params::enable_tuning,
   $user                       = $::port389::params::user,
   $group                      = $::port389::params::group,
@@ -32,6 +36,8 @@ class port389(
   $ssl_cert                   = $::port389::params::ssl_cert,
   $ssl_key                    = $::port389::params::ssl_key,
   $ssl_ca_certs               = $::port389::params::ssl_ca_certs,
+  $main_service_name          = $::port389::params::main_service_name,
+  $install_admin              = true,
 ) inherits port389::params {
   validate_re($ensure, '^present$|^absent$|^latest$|^purged$')
   if !(is_string($package_ensure) or is_array($package_ensure)) {
@@ -87,12 +93,12 @@ class port389(
         mode   => '0700',
       } ->
       Port389::Instance<| |> ->
-      service { 'dirsrv':
+      service { $main_service_name:
         ensure     => 'running',
         enable     => true,
         hasstatus  => true,
         hasrestart => true,
-      } ->
+      } ->      
       Anchor['port389::end']
     }
     # the global 'dirsrv' service is only managed for uninstall
