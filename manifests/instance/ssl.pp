@@ -57,7 +57,7 @@ define port389::instance::ssl (
   exec { "${name}-enable_ssl.ldif":
     path      => ['/bin', '/usr/bin'],
     command   => "ldapmodify ${ldap_connect} -f ${::port389::setup_dir}/enable_ssl.ldif",
-    unless    => "ldapsearch ${ldap_connect} -b cn=encryption,cn=config \"cn=RSA\"",
+    unless    => "ldapsearch ${ldap_connect} -b cn=encryption,cn=config \"cn=RSA\" | grep -q \"numEntries:\"",
     logoutput => true,
     require   => [Class['openldap::client'], File['enable_ssl.ldif']],
   } ->
