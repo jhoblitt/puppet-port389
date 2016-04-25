@@ -48,12 +48,13 @@ class port389::admin::ssl {
   # nss.conf
   #
   file { 'admin-pin.txt':
-    ensure  => file,
-    path    => "${certdir}/pin.txt",
-    owner   => $::port389::user,
-    group   => $::port389::group,
-    mode    => '0400',
-    content => "internal:${::port389::server_admin_pwd}",
+    ensure    => file,
+    path      => "${certdir}/pin.txt",
+    owner     => $::port389::user,
+    group     => $::port389::group,
+    mode      => '0400',
+    content   => "internal:${::port389::server_admin_pwd}",
+    show_diff => false
   }
 
   # by default, instances use pin.txt while admin server uses password.conf;

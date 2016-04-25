@@ -123,6 +123,7 @@ define port389::instance (
         mode    => '0600',
         content => template("${module_name}/inf.erb"),
         backup  => false,
+        show_diff => false
       } ->
       # /usr/sbin/setup-ds-admin.pl needs:
       #   /bin/{grep, cat, uname, sleep, ...}
