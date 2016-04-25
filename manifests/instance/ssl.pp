@@ -52,7 +52,7 @@ define port389::instance::ssl (
     backup  => false,
   }
 
-  $ldap_connect = "-x -H \"ldap://localhost:${server_port}\" -D \"${root_dn}\" -w \"${root_dn_pwd}\""
+  $ldap_connect = "-x -H \"ldap://localhost:${server_port}\" -D \"${root_dn}\" -y \"${::port389::setup_dir}/root_dn\""
 
   exec { "${name}-enable_ssl.ldif":
     path      => ['/bin', '/usr/bin'],

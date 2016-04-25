@@ -34,7 +34,7 @@ class port389::admin::ssl {
   }
 
   $ssl_server_port = $::port389::ssl_server_port
-  $ldap_connect = "-x -H \"ldap://localhost:${::port389::server_port}\" -D \"${::port389::root_dn}\" -w \"${::port389::root_dn_pwd}\""
+  $ldap_connect = "-x -H \"ldap://localhost:${::port389::server_port}\" -D \"${::port389::root_dn}\" -y \"${::port389::setup_dir}/root_dn\""
 
   exec { 'enable_admin_ssl.ldif':
     path      => ['/bin', '/usr/bin'],

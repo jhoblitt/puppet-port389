@@ -1,19 +1,43 @@
 # == Class: port389
 #
-# simple template
+# Parameters
+# [setup_dir]
+# The dir under which setup-ds-admin.pl .inf files will be created and stored. Default: '/var/lib/dirsrv/setup'.
+# Note that /var/lib/dirsrv/ is created by the 389-ds-base package.
+#
+# <Document other parameters>
 #
 # === Examples
 #
-# include port389
+# class { 'port389':
+#  enable_tuning              => true,
+#  admin_domain               => 'example.org',
+#  config_directory_admin_pwd => 'password',
+#  server_admin_pwd           => 'password',
+#  root_dn_pwd                => 'password',
+#  enable_ssl                 => true,
+#  enable_server_admin_ssl    => false,
+#  ssl_cert                   => '/tmp/example.org.pem',
+#  ssl_key                    => '/tmp/example.org.key',
+#  ssl_ca_certs               => {
+#    'AlphaSSL CA'        => '/tmp/alphassl_intermediate.pem',
+#    'GlobalSign Root CA' => '/tmp/globalsign_root.pem',
+#  },
+#  require                    => Class['augeas'],
+#}
+#
+#port389::instance { 'ldap1':
+#  schema_file => '/tmp/mycustomschema.ldif',
+#}
 #
 class port389(
   $ensure                     = 'present',
   $package_ensure             = $::port389::params::package_ensure,
   # these package name parameters can be arrays and they will be combined and installed
-  # 
-  $package_name               = $::port389::params::package_name, 
-  $package_name_admin         = $::port389::params::package_name_admin,  
-  $package_name_base          = $::port389::params::package_name_base,  
+  #
+  $package_name               = $::port389::params::package_name,
+  $package_name_admin         = $::port389::params::package_name_admin,
+  $package_name_base          = $::port389::params::package_name_base,
   $enable_tuning              = $::port389::params::enable_tuning,
   $user                       = $::port389::params::user,
   $group                      = $::port389::params::group,
@@ -92,13 +116,21 @@ class port389(
         group  => $group,
         mode   => '0700',
       } ->
+      file { "${setup_dir}/root_dn":
+        ensure    => file,
+        owner     => $user,
+        group     => $group,
+        mode      => '0600',
+        content   => $root_dn_pwd,
+        show_diff => false
+      } ->
       Port389::Instance<| |> ->
       service { $main_service_name:
         ensure     => 'running',
         enable     => true,
         hasstatus  => true,
         hasrestart => true,
-      } ->      
+      } ->
       Anchor['port389::end']
     }
     # the global 'dirsrv' service is only managed for uninstall
