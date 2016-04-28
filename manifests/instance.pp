@@ -14,12 +14,8 @@ define port389::instance (
   $ssl_ca_certs               = $::port389::ssl_ca_certs,
   $schema_file                = undef,
   $suffix                     = port389_domain2dn($::port389::admin_domain),
-  $disable_selinux_config     = false,
-  $disable_systemd_config     = false,
-  $install_admin_server       = true,
-  $start_server               = 'yes',
 ) {
-  # follow the same server identifier validation rules as setup-ds-admin.pl/setup-ds.pl
+  # follow the same server identifier validation rules as setup-ds-admin.pl
   validate_re($title, '^[\w#%:@-]*$', "The ServerIdentifier '${title}' contains invalid characters.  It must contain only alphanumeric characters and the following: #%:@_-")
   validate_string($admin_domain)
   validate_string($config_directory_admin_id)
@@ -39,12 +35,6 @@ define port389::instance (
   }
   # schema_file may be undef
   validate_string($suffix)
-
-  if $install_admin_server {
-    $install_script = 'setup-ds-admin.pl'
-  } else {
-    $install_script = 'setup-ds.pl'
-  }
 
   $setup_inf_name = "setup_${title}.inf"
   $setup_inf_path = "${::port389::setup_dir}/${setup_inf_name}"
@@ -83,7 +73,6 @@ define port389::instance (
       'Suffix'           => $suffix,
       'UseExistingMC'    => '0',
       'ds_bename'        => 'userRoot',
-      'start_server'     => $start_server,
       #'bak_dir' => '/var/lib/dirsrv/slapd-ldap1/bak',
       #'bindir' => '/usr/bin',
       #'cert_dir' => '/etc/dirsrv/slapd-ldap1',
@@ -104,13 +93,6 @@ define port389::instance (
       #'tmp_dir' => '/tmp',
     },
   }
-  if versioncmp($::operatingsystemrelease,'7.0') < 0 {
-    $servicename = $title
-  } else {
-    $servicename = "dirsrv@${title}"
-  }
-
-
 
   case $::port389::ensure {
     'present', 'latest': {
@@ -129,46 +111,16 @@ define port389::instance (
       #   /bin/{grep, cat, uname, sleep, ...}
       #   /sbin/service
       #   /usr/bin/env
-      exec { "${install_script}_${title}":
+      exec { "setup-ds-admin.pl_${title}":
         path      => [ '/bin', '/sbin', '/usr/bin', '/usr/sbin' ],
-        command   => "${install_script} --file=${setup_inf_path} --silent",
+        command   => "setup-ds-admin.pl --file=${setup_inf_path} --silent",
         unless    => "/usr/bin/test -e /etc/dirsrv/slapd-${title}",
         logoutput => true,
-        notify    => Service[ $servicename ],
+        notify    => Service[$title],
       }
-
-      notify {"Disable selinux config is ${disable_selinux_config}": }
-      if $disable_selinux_config {
-        notify {'Running sed exec': } ->
-        exec { 'disable selinux with sed':
-          path      => [ '/bin', '/sbin', '/usr/bin', '/usr/sbin' ],
-          command   => "sed -i 's/sub updateSelinuxPolicy {/& return;/' /usr/lib64/dirsrv/perl/*.pm",
-          unless    => 'grep "sub updateSelinuxPolicy { return; /usr/lib64/dirsrv/perl/*.pm' ,
-          logoutput => true,
-          before    => Exec["${install_script}_${title}"],
-          require   => Package['389-ds-base'],
-        } ->
-        notify {'Ran sed exec': }
-      }
-
-      notify {"Disable systemd config is ${disable_systemd_config}": }
-      if $disable_systemd_config {
-        notify {'Running sed exec systemd': } ->
-        exec { 'disable systemd with sed':
-          path      => [ '/bin', '/sbin', '/usr/bin', '/usr/sbin' ],
-          command   => "sed -i 's/sub updateSystemD {/& return;/' /usr/lib64/dirsrv/perl/*.pm",
-          unless    => 'grep "sub updateSystemD { return; /usr/lib64/dirsrv/perl/*.pm' ,
-          logoutput => true,
-          before    => Exec["${install_script}_${title}"],
-          require   => Package['389-ds-base'],
-        } ->
-        notify {'Ran sed exec systemd': }
-      }
-
-
 
       if $enable_ssl {
-        Exec["${install_script}_${title}"] ->
+        Exec["setup-ds-admin.pl_${title}"] ->
         port389::instance::ssl { $name:
           root_dn         => $root_dn,
           root_dn_pwd     => $root_dn_pwd,
@@ -177,39 +129,30 @@ define port389::instance (
           ssl_cert        => $ssl_cert,
           ssl_key         => $ssl_key,
           ssl_ca_certs    => $ssl_ca_certs,
-          notify          => Service[ $servicename],
+          notify          => Service[$title],
         }
       }
-      if $install_admin_server {
-        include port389::admin::service
 
-        Exec["${install_script}_${title}"] ->
+      include port389::admin::service
+
+      Exec["setup-ds-admin.pl_${title}"] ->
+      Class['port389::admin::service']
+
+      if $::port389::enable_server_admin_ssl {
+        include port389::admin::ssl
+
+        Exec["setup-ds-admin.pl_${title}"] ->
+        Class['port389::admin::ssl'] ->
         Class['port389::admin::service']
-
-        if $::port389::enable_server_admin_ssl {
-          include port389::admin::ssl
-
-          Exec["${install_script}_${title}"] ->
-          Class['port389::admin::ssl'] ->
-          Class['port389::admin::service']
-        }
       }
 
-      if versioncmp($::operatingsystemrelease,'7.0') < 0 {
-        # XXX this is extremely RedHat specific
-        service { $title :
-          ensure     => 'running',
-          control    => 'dirsrv',
-          hasstatus  => true,
-          hasrestart => true,
-          provider   => 'redhat_instance',
-        }
-      } else {
-        service { $servicename :
-          ensure     => 'running',
-          hasstatus  => true,
-          hasrestart => true,
-        }
+      # XXX this is extremely RedHat specific
+      service { $title:
+        ensure     => 'running',
+        control    => 'dirsrv',
+        hasstatus  => true,
+        hasrestart => true,
+        provider   => 'redhat_instance',
       }
     }
     default: {
