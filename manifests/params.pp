@@ -7,16 +7,8 @@ class port389::params {
     }
   }
 
-  if versioncmp($::operatingsystemrelease,'7.0') < 0 {
-    $main_service_name = 'dirsrv'
-  } else {
-    $main_service_name = 'dirsrv.target'
-  }
-
-  # we only support redhat, assuming we are on EL
-  if versioncmp($::operatingsystemrelease,'7.0') < 0 {
   # console also requires java
-  $package_name_admin = [
+  $package_name = [
     '389-admin',
     '389-admin-console',
     '389-admin-console-doc',
@@ -24,23 +16,6 @@ class port389::params {
     '389-adminutil',
     #'389-adminutil-debuginfo',
     '389-adminutil-devel',
-    ] 
-  } else {
-    # EL 7, some packages are no longer in epel, some packages won't be availble until after 7.1
-    $package_name_admin = [
-    '389-admin',
-    #'389-admin-console',
-    #'389-admin-console-doc',
-    #'389-admin-debuginfo',
-    '389-adminutil',
-    #'389-adminutil-debuginfo',
-    '389-adminutil-devel',
-    ]  
-  }
-  # we only support redhat, assuming we are on EL
-  if versioncmp($::operatingsystemrelease,'7.0') < 0 {
-  # console also requires java
-  $package_name_base = [
     '389-console',
     '389-ds',
     '389-ds-base',
@@ -49,17 +24,8 @@ class port389::params {
     '389-ds-console',
     '389-ds-console-doc',
     '389-dsgw',
-    ] 
-  } else {
-    # EL 7, some packages are no longer in epel, some packages won't be availble until after 7.1
-    $package_name_base = [
-    '389-ds-base',
-    '389-ds-base-devel',
-    '389-ds-base-libs',
-    ]  
-  }
-
-  $package_name = [] 
+    #'389-dsgw-debuginfo',
+  ]
 
   # console requires /usr/sbin/httpd.worker provided by `httpd`
   # we need to ensure the presence of this package but do not want 'ownership'

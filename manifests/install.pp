@@ -1,11 +1,8 @@
 # private class
 class port389::install (
   $ensure         = 'present',
-  $package_ensure     = $port389::package_ensure,
-  $package_name       = $port389::package_name,
-  $package_name_admin = $port389::package_name_admin,
-  $package_name_base  = $port389::package_name_base,
-  $install_admin      = $port389::install_admin,
+  $package_ensure = $port389::package_ensure,
+  $package_name   = $port389::package_name,
 ) {
   validate_re($ensure, '^present$|^absent$|^latest$|^purged$')
   if !(is_string($package_ensure) or is_array($package_ensure)) {
@@ -30,25 +27,9 @@ class port389::install (
     $safe_ensure = $ensure
   }
 
-  if ! empty($package_name) {
-    # if someone was setting package_name, use this instead of newer parameters
-    # that break up admin and base packages
-    package { $package_name:
-      ensure => $safe_ensure,
-    }
-  } elsif ($install_admin) {
-    package { $package_name_admin:
-      ensure => $safe_ensure,
-    }
-    package { $package_name_base:
-      ensure => $safe_ensure,
-    }
-  } else {
-    package { $package_name_base:
-      ensure => $safe_ensure,
-    }
+  package { $package_name:
+    ensure => $safe_ensure,
   }
-
 
   case $ensure {
     'present', 'latest': {
