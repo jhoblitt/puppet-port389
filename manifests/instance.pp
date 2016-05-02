@@ -1,4 +1,13 @@
 # port389::instance
+# [use_existing_mc]
+# Boolean. Sets whether to store the configuration data
+# in a separate Configuration Directory Server. Valid values are 0 or 1.
+# default: false, Meaning the configuration data are stored in this new instance.
+#
+# [slapd_config_for_mc]
+# Boolean. Sets whether to store the configuration data in the new Directory Server instance.
+# default: true, Meaning the configuration data are stored in this new instance.
+
 define port389::instance (
   $admin_domain               = $::port389::admin_domain,
   $config_directory_admin_id  = $::port389::config_directory_admin_id,
@@ -13,6 +22,8 @@ define port389::instance (
   $ssl_key                    = $::port389::ssl_key,
   $ssl_ca_certs               = $::port389::ssl_ca_certs,
   $schema_file                = undef,
+  $slapd_config_for_mc        = 'yes',
+  $use_existing_mc            = '0',
   $suffix                     = port389_domain2dn($::port389::admin_domain),
 ) {
   # follow the same server identifier validation rules as setup-ds-admin.pl
@@ -35,6 +46,9 @@ define port389::instance (
   }
   # schema_file may be undef
   validate_string($suffix)
+  #configuration directory
+  validate_re($slapd_config_for_mc,['yes','no'], "${slapd_config_for_mc} is invalid for slapd_config_for_mc. Must be set to yes or no")
+  validate_re($use_existing_mc,['0','1'],"${use_existing_mc} is invalid for use_existing_mc. Must be set to 0 or 1.")
 
   $setup_inf_name = "setup_${title}.inf"
   $setup_inf_path = "${::port389::setup_dir}/${setup_inf_name}"
@@ -69,9 +83,9 @@ define port389::instance (
       'SchemaFile'       => $schema_file,
       'ServerIdentifier' => $title,
       'ServerPort'       => $server_port,
-      'SlapdConfigForMC' => 'yes',
+      'SlapdConfigForMC' => $slapd_config_for_mc,
       'Suffix'           => $suffix,
-      'UseExistingMC'    => '0',
+      'UseExistingMC'    => $use_existing_mc,
       'ds_bename'        => 'userRoot',
       #'bak_dir' => '/var/lib/dirsrv/slapd-ldap1/bak',
       #'bindir' => '/usr/bin',
