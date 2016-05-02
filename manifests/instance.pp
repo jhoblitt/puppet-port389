@@ -1,13 +1,4 @@
 # port389::instance
-# [use_existing_mc]
-# Boolean. Sets whether to store the configuration data
-# in a separate Configuration Directory Server. Valid values are 0 or 1.
-# default: false, Meaning the configuration data are stored in this new instance.
-#
-# [slapd_config_for_mc]
-# Boolean. Sets whether to store the configuration data in the new Directory Server instance.
-# default: true, Meaning the configuration data are stored in this new instance.
-
 define port389::instance (
   $admin_domain               = $::port389::admin_domain,
   $config_directory_admin_id  = $::port389::config_directory_admin_id,
@@ -22,8 +13,8 @@ define port389::instance (
   $ssl_key                    = $::port389::ssl_key,
   $ssl_ca_certs               = $::port389::ssl_ca_certs,
   $schema_file                = undef,
-  $slapd_config_for_mc        = 'yes',
-  $use_existing_mc            = '0',
+  $slapd_config_for_mc        = $::port389::slapd_config_for_mc,
+  $use_existing_mc            = $::port389::use_existing_mc,
   $suffix                     = port389_domain2dn($::port389::admin_domain),
 ) {
   # follow the same server identifier validation rules as setup-ds-admin.pl
@@ -112,13 +103,13 @@ define port389::instance (
     'present', 'latest': {
       # disable bucketting since the .inf file contains password information
       file { $setup_inf_name:
-        ensure  => file,
-        path    => $setup_inf_path,
-        owner   => $::port389::user,
-        group   => $::port389::group,
-        mode    => '0600',
-        content => template("${module_name}/inf.erb"),
-        backup  => false,
+        ensure    => file,
+        path      => $setup_inf_path,
+        owner     => $::port389::user,
+        group     => $::port389::group,
+        mode      => '0600',
+        content   => template("${module_name}/inf.erb"),
+        backup    => false,
         show_diff => false
       } ->
       # /usr/sbin/setup-ds-admin.pl needs:
