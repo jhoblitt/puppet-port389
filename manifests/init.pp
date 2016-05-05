@@ -5,6 +5,14 @@
 # The dir under which setup-ds-admin.pl .inf files will be created and stored. Default: '/var/lib/dirsrv/setup'.
 # Note that /var/lib/dirsrv/ is created by the 389-ds-base package.
 #
+# [use_existing_mc]
+# Boolean. Sets whether to store the configuration data
+# in a separate Configuration Directory Server. Valid values are 0 or 1.
+# default: false, Meaning the configuration data are stored in this new instance.
+#
+# [slapd_config_for_mc]
+# Boolean. Sets whether to store the configuration data in the new Directory Server instance.
+# default: true, Meaning the configuration data are stored in this new instance.
 # <Document other parameters>
 #
 # === Examples
@@ -56,6 +64,8 @@ class port389(
   $ssl_cert                   = $::port389::params::ssl_cert,
   $ssl_key                    = $::port389::params::ssl_key,
   $ssl_ca_certs               = $::port389::params::ssl_ca_certs,
+  $slapd_config_for_mc        = $::port389::params::slapd_config_for_mc,
+  $use_existing_mc            = $::port389::params::use_existing_mc,
 ) inherits port389::params {
   validate_re($ensure, '^present$|^absent$|^latest$|^purged$')
   if !(is_string($package_ensure) or is_array($package_ensure)) {
