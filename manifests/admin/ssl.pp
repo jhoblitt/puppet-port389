@@ -1,12 +1,14 @@
 # private class
 class port389::admin::ssl(
   $service_name = undef,
+  $admin_domain = undef,
 ){
   if $caller_module_name != $module_name {
     fail("Use of private class ${name} by ${caller_module_name}")
   }
 
   validate_string($service_name)
+  validate_string($admin_domain)
 
   Class['port389::admin::ssl'] ~> Class['port389::admin::service']
 
