@@ -143,7 +143,7 @@ It must contain only alphanumeric characters and the following: #%:@_-")
         Exec["setup-ds-admin.pl_${title}"] ->
         class { 'port389::admin::ssl':
           service_name => $title,
-          admin_domain => $admin_domain
+          admin_domain => $admin_domain,
         } ->
         Class['port389::admin::service']
       }

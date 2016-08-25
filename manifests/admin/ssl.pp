@@ -1,7 +1,7 @@
 # private class
 class port389::admin::ssl(
   $service_name = undef,
-  $admin_domain = undef,
+  $admin_domain = $::port389::admin_domain,
 ){
   if $caller_module_name != $module_name {
     fail("Use of private class ${name} by ${caller_module_name}")
