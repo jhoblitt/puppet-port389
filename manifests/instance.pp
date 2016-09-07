@@ -16,7 +16,8 @@ define port389::instance (
   $suffix                     = port389_domain2dn($::port389::admin_domain),
 ) {
   # follow the same server identifier validation rules as setup-ds-admin.pl
-  validate_re($title, '^[\w#%:@-]*$', "The ServerIdentifier '${title}' contains invalid characters.  It must contain only alphanumeric characters and the following: #%:@_-")
+  validate_re($title, '^[\w#%:@-]*$', "The ServerIdentifier '${title}' contains invalid characters.\
+It must contain only alphanumeric characters and the following: #%:@_-")
   validate_string($admin_domain)
   validate_string($config_directory_admin_id)
   validate_string($config_directory_admin_pwd)

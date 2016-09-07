@@ -1,7 +1,7 @@
 require 'spec_helper'
 
 describe 'port389::instance', :type => :define do
-  let(:facts) {{ :osfamily => 'RedHat' }}
+  let(:facts) {{ :osfamily => 'RedHat', :os => 'Linux', :operatingsystemmajrelease => '6', :operatingsystemrelease => '6' }}
   let(:pre_condition) { 'include port389' }
 
   context 'title =>' do

@@ -12,7 +12,7 @@ describe 'port389', :type => :class do
   end
 
   describe 'on osfamily RedHat' do
-    let(:facts) {{ :osfamily => 'RedHat' }}
+    let(:facts) {{ :osfamily => 'RedHat', :os => 'Linux', :operatingsystemmajrelease => '6', :operatingsystemrelease => '6' }}
 
     redhat_packages = [
       '389-admin',
