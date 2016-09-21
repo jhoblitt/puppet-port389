@@ -40,6 +40,27 @@ It must contain only alphanumeric characters and the following: #%:@_-")
   $setup_inf_name = "setup_${title}.inf"
   $setup_inf_path = "${::port389::setup_dir}/${setup_inf_name}"
 
+  if $::osfamily == 'redhat' {
+    if is_hash($::os) {
+      $releasever = $::os[release][major]
+    } else {
+      $releasever = $::operatingsystemmajrelease
+    }
+    if $releasever == 7 {
+      $service_name = "dirsrv@${title}"
+      $service_provider = 'systemd'
+    } elsif $releasever == 6 {
+      $service_name = $title
+      $service_provider = 'redhat_instance'
+    } else {
+      $service_name = $title
+      $service_provider =  undef
+    }
+  } else {
+    $service_name = $title
+    $service_provider = undef
+  }
+
   # per
   # https://access.redhat.com/site/documentation/en-US/Red_Hat_Directory_Server/9.0/html/Installation_Guide/Advanced_Configuration-Silent.html
 
@@ -116,7 +137,7 @@ It must contain only alphanumeric characters and the following: #%:@_-")
         command   => "setup-ds-admin.pl --file=${setup_inf_path} --silent",
         unless    => "/usr/bin/test -e /etc/dirsrv/slapd-${title}",
         logoutput => true,
-        notify    => Service[$title],
+        notify    => Service[$service_name],
       }
 
       if $enable_ssl {
@@ -129,7 +150,7 @@ It must contain only alphanumeric characters and the following: #%:@_-")
           ssl_cert        => $ssl_cert,
           ssl_key         => $ssl_key,
           ssl_ca_certs    => $ssl_ca_certs,
-          notify          => Service[$title],
+          notify          => Service[$service_name],
         }
       }
 
@@ -147,12 +168,12 @@ It must contain only alphanumeric characters and the following: #%:@_-")
       }
 
       # XXX this is extremely RedHat specific
-      service { $title:
+      service { $service_name:
         ensure     => 'running',
         control    => 'dirsrv',
         hasstatus  => true,
         hasrestart => true,
-        provider   => 'redhat_instance',
+        provider   => $service_provider,
       }
     }
     default: {
