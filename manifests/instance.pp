@@ -46,10 +46,10 @@ It must contain only alphanumeric characters and the following: #%:@_-")
     } else {
       $releasever = $::operatingsystemmajrelease
     }
-    if $releasever == 7 {
+    if $releasever == '7' {
       $service_name = "dirsrv@${title}"
       $service_provider = 'systemd'
-    } elsif $releasever == 6 {
+    } elsif $releasever == '6' {
       $service_name = $title
       $service_provider = 'redhat_instance'
     } else {

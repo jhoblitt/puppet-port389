@@ -74,7 +74,7 @@ class port389(
     } else {
       $releasever = $::operatingsystemmajrelease
     }
-    if $releasever == 7 {
+    if $releasever == '7' {
       $service_name = 'dirsrv.target'
     } else {
       $service_name = 'dirsrv'
