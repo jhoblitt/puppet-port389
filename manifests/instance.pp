@@ -40,26 +40,7 @@ It must contain only alphanumeric characters and the following: #%:@_-")
   $setup_inf_name = "setup_${title}.inf"
   $setup_inf_path = "${::port389::setup_dir}/${setup_inf_name}"
 
-  if $::osfamily == 'redhat' {
-    if is_hash($::os) {
-      $releasever = $::os[release][major]
-    } else {
-      $releasever = $::operatingsystemmajrelease
-    }
-    if $releasever == '7' {
-      $service_name = "dirsrv@${title}"
-      $service_provider = 'systemd'
-    } elsif $releasever == '6' {
-      $service_name = $title
-      $service_provider = 'redhat_instance'
-    } else {
-      $service_name = $title
-      $service_provider =  undef
-    }
-  } else {
-    $service_name = $title
-    $service_provider = undef
-  }
+  $service_name = "${::port389::params::instance_service_prefix}${title}"
 
   # per
   # https://access.redhat.com/site/documentation/en-US/Red_Hat_Directory_Server/9.0/html/Installation_Guide/Advanced_Configuration-Silent.html
@@ -173,7 +154,7 @@ It must contain only alphanumeric characters and the following: #%:@_-")
         control    => 'dirsrv',
         hasstatus  => true,
         hasrestart => true,
-        provider   => $service_provider,
+        provider   => $::port389::params::service_provider,
       }
     }
     default: {

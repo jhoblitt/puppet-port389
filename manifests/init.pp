@@ -68,21 +68,6 @@ class port389(
     validate_hash($ssl_ca_certs)
   }
 
-  if $::osfamily == 'redhat' {
-    if is_hash($::os) {
-      $releasever = $::os[release][major]
-    } else {
-      $releasever = $::operatingsystemmajrelease
-    }
-    if $releasever == '7' {
-      $service_name = 'dirsrv.target'
-    } else {
-      $service_name = 'dirsrv'
-    }
-  } else {
-    $service_name = 'dirsrv'
-  }
-
   anchor { 'port389::begin': }
 
   case $ensure {
@@ -102,7 +87,7 @@ class port389(
         mode   => '0700',
       } ->
       Port389::Instance<| |> ->
-      service { $service_name:
+      service { $::port389::params::main_service_name:
         ensure     => 'running',
         enable     => true,
         hasstatus  => true,
@@ -114,7 +99,7 @@ class port389(
     # otherwise, each instance manages it's own 'sub' dirsrv service instance
     'absent': {
       Anchor['port389::begin'] ->
-      service { $service_name:
+      service { $::port389::params::main_service_name:
         ensure => 'stopped',
         enable => false,
       } ->
@@ -123,7 +108,7 @@ class port389(
     }
     'purged': {
       Anchor['port389::begin'] ->
-      service { $service_name:
+      service { $::port389::params::main_service_name:
         ensure     => 'stopped',
         enable     => false,
         hasstatus  => true,
