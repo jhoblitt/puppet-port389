@@ -1,44 +1,46 @@
 require 'spec_helper'
 
 describe 'port389::instance', :type => :define do
-  let(:facts) {{ :osfamily => 'RedHat', :os => 'Linux', :operatingsystemmajrelease => '6', :operatingsystemrelease => '6' }}
-  let(:pre_condition) { 'include port389' }
 
-  context 'title =>' do
-    context 'ldap1' do
-      let(:title) { 'ldap1' }
+  shared_examples 'port389::instance examples' do
 
-      it { should contain_port389__instance('ldap1') }
-    end
+    let(:pre_condition) { 'include port389' }
 
-    ['foo/bar', 'foo.bar', 'foo bar'].each do |title|
-      context title do
-        let(:title) { title }
+    context 'title =>' do
+      context 'ldap1' do
+        let(:title) { 'ldap1' }
 
-        it 'should fail' do
-        expect { should contain_port389__instance(title) }.
-          to raise_error(/It must contain only alphanumeric characters and the following: #%:@_/)
+        it { should contain_port389__instance('ldap1') }
+      end
+
+      ['foo/bar', 'foo.bar', 'foo bar'].each do |title|
+        context title do
+          let(:title) { title }
+
+          it 'should fail' do
+          expect { should contain_port389__instance(title) }.
+            to raise_error(/It must contain only alphanumeric characters and the following: #%:@_/)
+          end
         end
       end
     end
-  end
 
-  describe 'setup.inf' do
-    before do
-      facts[:domain] = 'foo.example.org'
-      facts[:fqdn]   = 'bar.foo.example.org'
-    end
-    let(:title) { 'ldap1' }
+    describe 'setup.inf' do
+      before do
+        facts[:domain] = 'foo.example.org'
+        facts[:fqdn]   = 'bar.foo.example.org'
+      end
+      let(:title) { 'ldap1' }
 
-    it do
-      should contain_file('setup_ldap1.inf').with({
-        :ensure  => 'file',
-        :path    => '/var/lib/dirsrv/setup/setup_ldap1.inf',
-        :owner   => 'nobody',
-        :group   => 'nobody',
-        :mode    => '0600',
-        :backup  => false,
-        :content => <<-EOS
+      it do
+        should contain_file('setup_ldap1.inf').with({
+          :ensure  => 'file',
+          :path    => '/var/lib/dirsrv/setup/setup_ldap1.inf',
+          :owner   => 'nobody',
+          :group   => 'nobody',
+          :mode    => '0600',
+          :backup  => false,
+          :content => <<-EOS
 [General]
 AdminDomain=foo.example.org
 ConfigDirectoryAdminID=admin
@@ -66,51 +68,33 @@ SlapdConfigForMC=yes
 Suffix=dc=foo,dc=example,dc=org
 UseExistingMC=0
 ds_bename=userRoot
-        EOS
-      })
-    end
-
-    it do
-      should contain_exec('setup-ds-admin.pl_ldap1').with({
-        :path      => [ '/bin', '/sbin', '/usr/bin', '/usr/sbin' ],
-        :command   => 'setup-ds-admin.pl --file=/var/lib/dirsrv/setup/setup_ldap1.inf --silent',
-        :unless    => '/usr/bin/test -e /etc/dirsrv/slapd-ldap1',
-        :logoutput => true,
-      }).that_notifies('Service[ldap1]')
-    end
-
-    it do
-      should contain_service('ldap1').with({
-        :ensure     => 'running',
-        :control    => 'dirsrv',
-        :hasstatus  => true,
-        :hasrestart => true,
-        :provider   => 'redhat_instance',
-      })
-    end
-
-    context 'schema_file =>' do
-      context '/dne/foo.ldif' do
-        let(:params) {{ :schema_file => '/dne/foo.ldif' }}
-
-        it do
-          should contain_file('setup_ldap1.inf').with({
-            :ensure  => 'file',
-            :path    => '/var/lib/dirsrv/setup/setup_ldap1.inf',
-            :owner   => 'nobody',
-            :group   => 'nobody',
-            :mode    => '0600',
-            :backup  => false,
-            :content => %r{SchemaFile=/dne/foo.ldif},
-          })
-        end
+          EOS
+        })
       end
 
-      context '[ /dne/foo.ldif, /dne/bar.ldif ]' do
-        files = %w{ /dne/foo.ldif /dne/bar.ldif }
-        let(:params) {{ :schema_file => files }}
+      it do
+        should contain_exec('setup-ds-admin.pl_ldap1').with({
+          :path      => [ '/bin', '/sbin', '/usr/bin', '/usr/sbin' ],
+          :command   => 'setup-ds-admin.pl --file=/var/lib/dirsrv/setup/setup_ldap1.inf --silent',
+          :unless    => '/usr/bin/test -e /etc/dirsrv/slapd-ldap1',
+          :logoutput => true,
+        }).that_notifies("Service[#{service_params[:name]}]")
+      end
 
-        files.each do |f|
+      it do
+        should contain_service(service_params[:name]).with({
+          :ensure     => 'running',
+          :control    => 'dirsrv',
+          :hasstatus  => true,
+          :hasrestart => true,
+          :provider   => service_params[:provider],
+        })
+      end
+
+      context 'schema_file =>' do
+        context '/dne/foo.ldif' do
+          let(:params) {{ :schema_file => '/dne/foo.ldif' }}
+
           it do
             should contain_file('setup_ldap1.inf').with({
               :ensure  => 'file',
@@ -119,41 +103,71 @@ ds_bename=userRoot
               :group   => 'nobody',
               :mode    => '0600',
               :backup  => false,
-              :content => /SchemaFile=#{f}/
+              :content => %r{SchemaFile=/dne/foo.ldif},
             })
           end
         end
-      end
 
-    end # schema_file =>
-  end # setup.inf
+        context '[ /dne/foo.ldif, /dne/bar.ldif ]' do
+          files = %w{ /dne/foo.ldif /dne/bar.ldif }
+          let(:params) {{ :schema_file => files }}
 
-  context 'class { port389: ensure => ... }' do
-    let(:title) { 'ldap1' }
-
-    %w{ present latest }.each do |state|
-      context state do
-        let(:pre_condition) do <<-EOS
-          class { 'port389': ensure => #{state} }
-          EOS
+          files.each do |f|
+            it do
+              should contain_file('setup_ldap1.inf').with({
+                :ensure  => 'file',
+                :path    => '/var/lib/dirsrv/setup/setup_ldap1.inf',
+                :owner   => 'nobody',
+                :group   => 'nobody',
+                :mode    => '0600',
+                :backup  => false,
+                :content => /SchemaFile=#{f}/
+              })
+            end
+          end
         end
 
-        it { should contain_file('setup_ldap1.inf') }
-        it { should contain_exec('setup-ds-admin.pl_ldap1') }
-      end
-    end
+      end # schema_file =>
+    end # setup.inf
 
-    %w{ absent purged }.each do |state|
-      context state do
-        let(:pre_condition) do <<-EOS
-          class { 'port389': ensure => #{state} }
-          EOS
+    context 'class { port389: ensure => ... }' do
+      let(:title) { 'ldap1' }
+
+      %w{ present latest }.each do |state|
+        context state do
+          let(:pre_condition) do <<-EOS
+            class { 'port389': ensure => #{state} }
+            EOS
+          end
+
+          it { should contain_file('setup_ldap1.inf') }
+          it { should contain_exec('setup-ds-admin.pl_ldap1') }
         end
-
-        it { should_not contain_file('setup_ldap1.inf') }
-        it { should_not contain_exec('setup-ds-admin.pl_ldap1') }
       end
-    end
-  end # class { port389: ensure => ... }
 
+      %w{ absent purged }.each do |state|
+        context state do
+          let(:pre_condition) do <<-EOS
+            class { 'port389': ensure => #{state} }
+            EOS
+          end
+
+          it { should_not contain_file('setup_ldap1.inf') }
+          it { should_not contain_exec('setup-ds-admin.pl_ldap1') }
+        end
+      end
+    end # class { port389: ensure => ... }
+  end # shared_example
+
+  describe 'on RedHat 6' do
+    let(:facts) {{ :osfamily => 'RedHat', :os => 'Linux', :operatingsystemmajrelease => '6', :operatingsystemrelease => '6' }}
+    let(:service_params) {{ :name => 'ldap1', :provider => 'redhat_instance' }}
+    include_examples 'port389::instance examples'
+  end # redhat 6
+
+  describe 'on RedHat 7' do
+    let(:facts) {{ :osfamily => 'RedHat', :os => 'Linux', :operatingsystemmajrelease => '7', :operatingsystemrelease => '7' }}
+    let(:service_params) {{ :name => 'dirsrv@ldap1', :provider => 'systemd' }}
+    include_examples 'port389::instance examples'
+  end # redhat 7
 end
