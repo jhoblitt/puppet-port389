@@ -57,14 +57,15 @@ define port389::instance::ssl (
   exec { "${name}-enable_ssl.ldif":
     path      => ['/bin', '/usr/bin'],
     command   => "ldapmodify ${ldap_connect} -f ${::port389::setup_dir}/enable_ssl.ldif",
-    unless    => "ldapsearch ${ldap_connect} -b cn=encryption,cn=config \"nsSSL3=on\" nsSSL3 | grep \"nsSSL3: on\"",
+    unless    => "ldapsearch ${ldap_connect} -b cn=config \"nsslapd-security=on\" nsslapd-security | grep \"nsslapd-security: on\"",
     logoutput => true,
     require   => [Class['openldap::client'], File['enable_ssl.ldif']],
   } ->
   exec { "${name}-set_secureport.ldif":
     path      => ['/bin', '/usr/bin'],
     command   => "ldapmodify ${ldap_connect} -f ${::port389::setup_dir}/${name}-set_secureport.ldif",
-    unless    => "ldapsearch ${ldap_connect} -b cn=config \"nsslapd-secureport=${ssl_server_port}\" nsslapd-secureport | grep \"nsslapd-secureport: ${ssl_server_port}\"",
+    unless    => "ldapsearch ${ldap_connect} -b cn=config \"nsslapd-secureport=${ssl_server_port}\" nsslapd-secureport \
+| grep \"nsslapd-secureport: ${ssl_server_port}\"",
     logoutput => true,
     require   => [Class['openldap::client'], File["${name}-set_secureport.ldif"]],
   }

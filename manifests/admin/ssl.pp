@@ -39,7 +39,8 @@ class port389::admin::ssl {
   exec { 'enable_admin_ssl.ldif':
     path      => ['/bin', '/usr/bin'],
     command   => "ldapmodify ${ldap_connect} -f ${::port389::setup_dir}/enable_admin_ssl.ldif",
-    unless    => "ldapsearch ${ldap_connect} -b \"cn=slapd-ldap1,cn=389 Directory Server,cn=Server Group,cn=main.vm,ou=sdm.noao.edu,o=NetscapeRoot\" nsServerSecurity nsServerSecurity | grep \"nsServerSecurity: on\"",
+    unless    => "ldapsearch ${ldap_connect} -b \"cn=slapd-ldap1,cn=389 Directory Server,cn=Server Group,\
+cn=main.vm,ou=sdm.noao.edu,o=NetscapeRoot\" nsServerSecurity nsServerSecurity | grep \"nsServerSecurity: on\"",
     logoutput => true,
     require   => [Class['openldap::client'], File['enable_admin_ssl.ldif']],
   } ->

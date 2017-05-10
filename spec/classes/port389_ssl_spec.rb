@@ -2,7 +2,13 @@ require 'spec_helper'
 
 describe 'port389', :type => :class do
   describe 'on osfamily RedHat' do
-    let(:facts) {{ :osfamily => 'RedHat' }}
+    let(:facts) {{
+      :osfamily => 'RedHat',
+      :os => 'Linux',
+      :operatingsystemmajrelease => '6',
+      :operatingsystemrelease => '6',
+      :puppetversion => Puppet.version,
+    }}
     let(:params) do
       {
         :ssl_cert     => '/dne/cert.pem',
