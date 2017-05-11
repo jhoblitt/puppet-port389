@@ -1,10 +1,16 @@
 # private class
-class port389::admin::ssl {
+class port389::admin::ssl(
+  $service_name = undef,
+  $admin_domain = $::port389::admin_domain,
+){
   if $caller_module_name != $module_name {
     fail("Use of private class ${name} by ${caller_module_name}")
   }
 
-  Class['port389::admin::ssl'] -> Class['port389::admin::service']
+  validate_string($service_name)
+  validate_string($admin_domain)
+
+  Class['port389::admin::ssl'] ~> Class['port389::admin::service']
 
   # per
   # http://directory.fedoraproject.org/wiki/Howto:SSL#Admin_Server_SSL_Information
@@ -39,8 +45,8 @@ class port389::admin::ssl {
   exec { 'enable_admin_ssl.ldif':
     path      => ['/bin', '/usr/bin'],
     command   => "ldapmodify ${ldap_connect} -f ${::port389::setup_dir}/enable_admin_ssl.ldif",
-    unless    => "ldapsearch ${ldap_connect} -b \"cn=slapd-ldap1,cn=389 Directory Server,cn=Server Group,\
-cn=main.vm,ou=sdm.noao.edu,o=NetscapeRoot\" nsServerSecurity nsServerSecurity | grep \"nsServerSecurity: on\"",
+    unless    => "ldapsearch ${ldap_connect} -b \"cn=slapd-${service_name},cn=389 Directory Server,cn=Server Group,\
+cn=${::port389::full_machine_name},ou=${admin_domain},o=NetscapeRoot\" nsServerSecurity nsServerSecurity | grep \"nsServerSecurity: on\"",
     logoutput => true,
     require   => [Class['openldap::client'], File['enable_admin_ssl.ldif']],
   } ->

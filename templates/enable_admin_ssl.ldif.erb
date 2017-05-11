@@ -1,4 +1,4 @@
-dn: cn=slapd-ldap1,cn=389 Directory Server,cn=Server Group,cn=main.vm,ou=sdm.noao.edu,o=NetscapeRoot
+dn: cn=slapd-<%= @service_name %>,cn=389 Directory Server,cn=Server Group,cn=<%= scope['port389::full_machine_name'] %>,ou=<%= @admin_domain %>,o=NetscapeRoot
 changetype: modify
 replace: nsServerSecurity
 nsServerSecurity: on
@@ -6,7 +6,7 @@ nsServerSecurity: on
 replace: nsSecureServerPort
 nsSecureServerPort: <%= @ssl_server_port %>
 
-dn: cn=configuration,cn=admin-serv-main,cn=389 Administration Server,cn=Server Group,cn=main.vm,ou=sdm.noao.edu,o=NetscapeRoot
+dn: cn=configuration,cn=admin-serv-<%= @hostname %>,cn=389 Administration Server,cn=Server Group,cn=<%= scope['port389::full_machine_name'] %>,ou=<%= @admin_domain %>,o=NetscapeRoot
 changetype: modify
 replace: nsServerSecurity
 nsServerSecurity: on

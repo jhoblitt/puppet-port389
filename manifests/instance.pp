@@ -141,10 +141,12 @@ It must contain only alphanumeric characters and the following: #%:@_-")
       Class['port389::admin::service']
 
       if $::port389::enable_server_admin_ssl {
-        include port389::admin::ssl
 
         Exec["setup-ds-admin.pl_${title}"] ->
-        Class['port389::admin::ssl'] ->
+        class { 'port389::admin::ssl':
+          service_name => $title,
+          admin_domain => $admin_domain,
+        } ->
         Class['port389::admin::service']
       }
 
