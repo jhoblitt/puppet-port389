@@ -87,7 +87,7 @@ class port389(
         mode   => '0700',
       } ->
       Port389::Instance<| |> ->
-      service { 'dirsrv':
+      service { $::port389::params::main_service_name:
         ensure     => 'running',
         enable     => true,
         hasstatus  => true,
@@ -99,7 +99,7 @@ class port389(
     # otherwise, each instance manages it's own 'sub' dirsrv service instance
     'absent': {
       Anchor['port389::begin'] ->
-      service { 'dirsrv':
+      service { $::port389::params::main_service_name:
         ensure => 'stopped',
         enable => false,
       } ->
@@ -108,7 +108,7 @@ class port389(
     }
     'purged': {
       Anchor['port389::begin'] ->
-      service { 'dirsrv':
+      service { $::port389::params::main_service_name:
         ensure     => 'stopped',
         enable     => false,
         hasstatus  => true,

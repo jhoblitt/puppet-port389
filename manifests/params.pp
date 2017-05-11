@@ -1,7 +1,30 @@
 # private class
 class port389::params {
   case $::osfamily {
-    'redhat': {}
+    'redhat': {
+      if is_hash($::os) {
+        $releasever = $::os[release][major]
+      } else {
+        $releasever = $::operatingsystemmajrelease
+      }
+      case $releasever {
+        '7': {
+          $main_service_name = 'dirsrv.target'
+          $instance_service_prefix = 'dirsrv@'
+          $service_provider = 'systemd'
+        }
+        '6': {
+          $main_service_name = 'dirsrv'
+          $instance_service_prefix = ''
+          $service_provider = 'redhat_instance'
+        }
+        default: {
+          $main_service_name = 'dirsrv'
+          $instance_service_prefix = ''
+          $service_provider =  undef
+        }
+      }
+    }
     default: {
       fail("Module ${module_name} is not supported on ${::operatingsystem}")
     }
