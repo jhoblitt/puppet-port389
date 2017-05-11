@@ -52,7 +52,7 @@ define port389::instance::ssl (
     backup  => false,
   }
 
-  $ldap_connect = "-x -H \"ldap://localhost:${server_port}\" -D \"${root_dn}\" -w \"${root_dn_pwd}\""
+  $ldap_connect = "-x -H \"ldap://localhost:${server_port}\" -D \"${root_dn}\" -y \"${::port389::setup_dir}/root_dn\""
 
   exec { "${name}-enable_ssl.ldif":
     path      => ['/bin', '/usr/bin'],
@@ -73,12 +73,13 @@ define port389::instance::ssl (
   $certdir = "/etc/dirsrv/slapd-${name}"
 
   file { "${name}-pin.txt":
-    ensure  => file,
-    path    => "${certdir}/pin.txt",
-    owner   => $::port389::user,
-    group   => $::port389::group,
-    mode    => '0400',
-    content => "Internal (Software) Token:${root_dn_pwd}",
+    ensure    => file,
+    path      => "${certdir}/pin.txt",
+    owner     => $::port389::user,
+    group     => $::port389::group,
+    mode      => '0400',
+    content   => "Internal (Software) Token:${root_dn_pwd}",
+    show_diff => false
   }
 
   port389::certs{ $name:

@@ -76,9 +76,11 @@ class port389::params {
   $server_ipaddress  = '0.0.0.0'
 
   # slapd section defaults
-  $root_dn     = 'cn=Directory Manager'
-  $root_dn_pwd = 'password'
-  $server_port = '389'
+  $root_dn             = 'cn=Directory Manager'
+  $root_dn_pwd         = 'password'
+  $server_port         = '389'
+  $use_existing_mc     = 0
+  $slapd_config_for_mc = 'yes'
 
   # the dir under which setup-ds-admin.pl .inf files will be created and stored
   # note that /var/lib/dirsrv/ is created by the 389-ds-base package

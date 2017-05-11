@@ -1,10 +1,42 @@
 # == Class: port389
 #
-# simple template
+# Parameters
+# [setup_dir]
+# The dir under which setup-ds-admin.pl .inf files will be created and stored. Default: '/var/lib/dirsrv/setup'.
+# Note that /var/lib/dirsrv/ is created by the 389-ds-base package.
+#
+# [use_existing_mc]
+# Boolean. Sets whether to store the configuration data
+# in a separate Configuration Directory Server. Valid values are 0 or 1.
+# default: false, Meaning the configuration data are stored in this new instance.
+#
+# [slapd_config_for_mc]
+# Boolean. Sets whether to store the configuration data in the new Directory Server instance.
+# default: true, Meaning the configuration data are stored in this new instance.
+# <Document other parameters>
 #
 # === Examples
 #
-# include port389
+# class { 'port389':
+#  enable_tuning              => true,
+#  admin_domain               => 'example.org',
+#  config_directory_admin_pwd => 'password',
+#  server_admin_pwd           => 'password',
+#  root_dn_pwd                => 'password',
+#  enable_ssl                 => true,
+#  enable_server_admin_ssl    => false,
+#  ssl_cert                   => '/tmp/example.org.pem',
+#  ssl_key                    => '/tmp/example.org.key',
+#  ssl_ca_certs               => {
+#    'AlphaSSL CA'        => '/tmp/alphassl_intermediate.pem',
+#    'GlobalSign Root CA' => '/tmp/globalsign_root.pem',
+#  },
+#  require                    => Class['augeas'],
+#}
+#
+#port389::instance { 'ldap1':
+#  schema_file => '/tmp/mycustomschema.ldif',
+#}
 #
 class port389(
   $ensure                     = 'present',
@@ -32,6 +64,8 @@ class port389(
   $ssl_cert                   = $::port389::params::ssl_cert,
   $ssl_key                    = $::port389::params::ssl_key,
   $ssl_ca_certs               = $::port389::params::ssl_ca_certs,
+  $slapd_config_for_mc        = $::port389::params::slapd_config_for_mc,
+  $use_existing_mc            = $::port389::params::use_existing_mc,
 ) inherits port389::params {
   validate_re($ensure, '^present$|^absent$|^latest$|^purged$')
   if !(is_string($package_ensure) or is_array($package_ensure)) {
@@ -85,6 +119,14 @@ class port389(
         owner  => $user,
         group  => $group,
         mode   => '0700',
+      } ->
+      file { "${setup_dir}/root_dn":
+        ensure    => file,
+        owner     => $user,
+        group     => $group,
+        mode      => '0600',
+        content   => $root_dn_pwd,
+        show_diff => false
       } ->
       Port389::Instance<| |> ->
       service { $::port389::params::main_service_name:
